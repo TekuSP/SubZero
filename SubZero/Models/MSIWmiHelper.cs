@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Management;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Management;
 
 namespace SubZero.Models
 {
@@ -12,70 +7,8 @@ namespace SubZero.Models
     /// </summary>
     public class MSIWmiHelper
     {
-        /// <summary>
-        /// CPU WMI
-        /// </summary>
-        public ManagementObjectSearcher MSI_CPU { get; private set; }
-        /// <summary>
-        /// Is MSI CPU Available to be used?
-        /// </summary>
-        public bool IsAvailableMSI_CPU { get; private set; }
-        /// <summary>
-        /// GPU WMI
-        /// </summary>
-        public ManagementObjectSearcher MSI_GPU { get; private set; }
-        /// <summary>
-        /// Is MSI GPU Available to be used?
-        /// </summary>
-        public bool IsAvailableMSI_GPU { get; private set; }
-        /// <summary>
-        /// AP WMI
-        /// </summary>
-        public ManagementObjectSearcher MSI_AP { get; private set; }
-        /// <summary>
-        /// Is MSI AP Available to be used?
-        /// </summary>
-        public bool IsAvailableMSI_AP { get; private set; }
-        /// <summary>
-        /// Master Battery WMI
-        /// </summary>
-        public ManagementObjectSearcher MSI_Master_Battery { get; private set; }
-        /// <summary>
-        /// Is MSI Master Battery Available to be used?
-        /// </summary>
-        public bool IsAvailableMSI_Master_Battery { get; private set; }
-        /// <summary>
-        /// Power WMI
-        /// </summary>
-        public ManagementObjectSearcher MSI_Power { get; private set; }
-        /// <summary>
-        /// Is MSI Power Available to be used?
-        /// </summary>
-        public bool IsAvailableMSI_Power { get; private set; }
-        /// <summary>
-        /// MSI Laptop Model
-        /// </summary>
-        public ManagementObjectSearcher MSI_LaptopModel { get; private set; }
-        /// <summary>
-        /// Is MSI Laptop Model ready to be used?
-        /// </summary>
-        public bool IsAvailableMSI_LaptopModel { get; private set; }
-        /// <summary>
-        /// Windows PowerPlan WMI, do we need this?
-        /// </summary>
-        public ManagementObjectSearcher WIN_PowerPlan { get; private set; }
-        /// <summary>
-        /// Is Windows PowerPlan Available to be used?
-        /// </summary>
-        public bool IsAvailableWIN_PowerPlan { get; private set; }
-        /// <summary>
-        /// Windows Display WMI, do we need this?
-        /// </summary>
-        public ManagementObjectSearcher WIN_DisplayConfig { get; private set; }
-        /// <summary>
-        /// Is Windows DisplayConfig Available to be used?
-        /// </summary>
-        public bool IsAvailableWIN_DisplayConfig { get; private set; }
+        #region Public Constructors
+
         /// <summary>
         /// Initializes WMI helper for MSI Laptops
         /// </summary>
@@ -124,5 +57,91 @@ namespace SubZero.Models
                 IsAvailableWIN_DisplayConfig = test.Count != 0;
             }
         }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        /// <summary>
+        /// Is MSI AP Available to be used?
+        /// </summary>
+        public bool IsAvailableMSI_AP { get; private set; }
+
+        /// <summary>
+        /// Is MSI CPU Available to be used?
+        /// </summary>
+        public bool IsAvailableMSI_CPU { get; private set; }
+
+        /// <summary>
+        /// Is MSI GPU Available to be used?
+        /// </summary>
+        public bool IsAvailableMSI_GPU { get; private set; }
+
+        /// <summary>
+        /// Is MSI Laptop Model ready to be used?
+        /// </summary>
+        public bool IsAvailableMSI_LaptopModel { get; private set; }
+
+        /// <summary>
+        /// Is MSI Master Battery Available to be used?
+        /// </summary>
+        public bool IsAvailableMSI_Master_Battery { get; private set; }
+
+        /// <summary>
+        /// Is MSI Power Available to be used?
+        /// </summary>
+        public bool IsAvailableMSI_Power { get; private set; }
+
+        /// <summary>
+        /// Is Windows DisplayConfig Available to be used?
+        /// </summary>
+        public bool IsAvailableWIN_DisplayConfig { get; private set; }
+
+        /// <summary>
+        /// Is Windows PowerPlan Available to be used?
+        /// </summary>
+        public bool IsAvailableWIN_PowerPlan { get; private set; }
+
+        /// <summary>
+        /// AP WMI
+        /// </summary>
+        public ManagementObjectSearcher MSI_AP { get; private set; }
+
+        /// <summary>
+        /// CPU WMI
+        /// </summary>
+        public ManagementObjectSearcher MSI_CPU { get; private set; }
+
+        /// <summary>
+        /// GPU WMI
+        /// </summary>
+        public ManagementObjectSearcher MSI_GPU { get; private set; }
+
+        /// <summary>
+        /// MSI Laptop Model
+        /// </summary>
+        public ManagementObjectSearcher MSI_LaptopModel { get; private set; }
+
+        /// <summary>
+        /// Master Battery WMI
+        /// </summary>
+        public ManagementObjectSearcher MSI_Master_Battery { get; private set; }
+
+        /// <summary>
+        /// Power WMI
+        /// </summary>
+        public ManagementObjectSearcher MSI_Power { get; private set; }
+
+        /// <summary>
+        /// Windows Display WMI, do we need this?
+        /// </summary>
+        public ManagementObjectSearcher WIN_DisplayConfig { get; private set; }
+
+        /// <summary>
+        /// Windows PowerPlan WMI, do we need this?
+        /// </summary>
+        public ManagementObjectSearcher WIN_PowerPlan { get; private set; }
+
+        #endregion Public Properties
     }
 }

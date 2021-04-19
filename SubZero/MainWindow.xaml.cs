@@ -2,8 +2,9 @@ using MaterialDesignExtensions.Controls;
 
 using Newtonsoft.Json;
 
-using SubZero.Resources;
 using SubZero.Models;
+using SubZero.Resources;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,9 +50,13 @@ namespace SubZero
         #endregion Public Constructors
 
         #region Public Events
+
 #pragma warning disable 67
+
         public event PropertyChangedEventHandler PropertyChanged;
+
 #pragma warning restore 67
+
         #endregion Public Events
 
         #region Public Properties
@@ -235,21 +240,27 @@ namespace SubZero
                         case 4:
                             cpuTemps.Value1.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 5:
                             cpuTemps.Value2.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 6:
                             cpuTemps.Value3.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 7:
                             cpuTemps.Value4.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 8:
                             cpuTemps.Value5.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 9:
                             cpuTemps.Value6.Temperature = Convert.ToInt32(cpuValue["CPU"]);
                             break;
+
                         case 11:
                             cpuTemps.Value1.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
@@ -285,21 +296,27 @@ namespace SubZero
                         case 4:
                             gpuTemps.Value1.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 5:
                             gpuTemps.Value2.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 6:
                             gpuTemps.Value3.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 7:
                             gpuTemps.Value4.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 8:
                             gpuTemps.Value5.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 9:
                             gpuTemps.Value6.Temperature = Convert.ToInt32(gpuValue["VGA"]);
                             break;
+
                         case 11:
                             gpuTemps.Value1.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;

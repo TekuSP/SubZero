@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+
 namespace SubZero.Models
 {
     /// <summary>
@@ -8,11 +8,16 @@ namespace SubZero.Models
     [Serializable]
     public class Profile
     {
+        #region Public Constructors
+
         public Profile()
         {
             CPU = new TemperatureSettings();
             GPU = new TemperatureSettings();
         }
+
+        #endregion Public Constructors
+
         #region Public Properties
 
         /// <summary>
@@ -39,13 +44,23 @@ namespace SubZero.Models
     [Serializable]
     public class Settings
     {
+        #region Public Constructors
+
         public Settings()
         {
             Profiles = new Profile[0];
             FanPollingSpeed = 500;
             TemperaturePollingSpeed = 500;
         }
+
+        #endregion Public Constructors
+
         #region Public Properties
+
+        /// <summary>
+        /// Polling speed of fans RPM in milliseconds
+        /// </summary>
+        public int FanPollingSpeed { get; set; }
 
         /// <summary>
         /// Model of laptop where settings were generated, if different, user must be informed
@@ -58,19 +73,14 @@ namespace SubZero.Models
         public Profile[] Profiles { get; set; }
 
         /// <summary>
-        /// Version of settings, if older is detected, upgrade is required
-        /// </summary>
-        public int Version { get; set; }
-
-        /// <summary>
-        /// Polling speed of fans RPM in milliseconds
-        /// </summary>
-        public int FanPollingSpeed { get; set; }
-
-        /// <summary>
         /// Polling speed of temperatures in milliseconds
         /// </summary>
         public int TemperaturePollingSpeed { get; set; }
+
+        /// <summary>
+        /// Version of settings, if older is detected, upgrade is required
+        /// </summary>
+        public int Version { get; set; }
 
         #endregion Public Properties
     }
@@ -81,6 +91,8 @@ namespace SubZero.Models
     [Serializable]
     public class TemperatureSettings
     {
+        #region Public Constructors
+
         public TemperatureSettings()
         {
             Value1 = new TempFan();
@@ -90,6 +102,9 @@ namespace SubZero.Models
             Value5 = new TempFan();
             Value6 = new TempFan();
         }
+
+        #endregion Public Constructors
+
         #region Public Properties
 
         /// <summary>
@@ -97,7 +112,7 @@ namespace SubZero.Models
         /// </summary>
         public static TemperatureSettings FactoryCPU => new TemperatureSettings()
         {
-            Value1 = new TempFan(0,0),
+            Value1 = new TempFan(0, 0),
             Value2 = new TempFan(50, 40),
             Value3 = new TempFan(56, 48),
             Value4 = new TempFan(62, 56),
@@ -150,6 +165,7 @@ namespace SubZero.Models
 
         #endregion Public Properties
     }
+
     /// <summary>
     /// Structure for Fan Speeds and Temperature
     /// </summary>
@@ -171,7 +187,6 @@ namespace SubZero.Models
         /// </summary>
         public TempFan()
         {
-
         }
         /// <summary>
         /// Temperature in degrees Celsius
