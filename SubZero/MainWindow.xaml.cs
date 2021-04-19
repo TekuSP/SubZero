@@ -27,27 +27,59 @@ namespace SubZero
     /// </summary>
     public partial class MainWindow : MaterialWindow, INotifyPropertyChanged
     {
+        /// <summary>
+        /// Config file location
+        /// </summary>
         const string configFileName = "subzero.config";
+        /// <summary>
+        /// Version of config file
+        /// </summary>
         const int configFileVersion = 1;
+        /// <summary>
+        /// CPU WMI
+        /// </summary>
         private ManagementObjectSearcher MSI_CPU;
+        /// <summary>
+        /// GPU WMI
+        /// </summary>
         private ManagementObjectSearcher MSI_GPU;
 
         public event PropertyChangedEventHandler PropertyChanged;
-
+        /// <summary>
+        /// Did user edit any settings?
+        /// </summary>
         public bool IsEdited { get; set; } = false;
+        /// <summary>
+        /// Can we delete this profile?
+        /// </summary>
         public bool DeleteAllowed { get; set; }
+        /// <summary>
+        /// Laptop model we are running on
+        /// </summary>
+        public string LaptopModel { get; set; }
+
+
         public MainWindow()
         {
             InitializeComponent();
+            //Init icons
             var imgSource = Convertors.ImageTools.ImageSourceFromBitmap(DesignSource.logo_icon);
             this.Icon = imgSource;
             this.TitleBarIcon = imgSource;
         }
-
+        /// <summary>
+        /// Happens when rendering is done
+        /// </summary>
         private void MaterialWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            //Window is Loaded, start initialization, load Managment Objects
             MSI_CPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_CPU");
             MSI_GPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_VGA");
+            var MSI_BIOS = new ManagementObjectSearcher("root\\CIMV2", "SELECT SMBIOSBIOSVersion FROM WIN32_BIOS");
+            var MSI_MTHB = new ManagementObjectSearcher("root\\CIMV2", "SELECT Model FROM Win32_ComputerSystem");
+            //Disposable, test components if we are on MSI laptop
+            using (var biosInfo = MSI_BIOS.Get())
+            using (var mthbInfo = MSI_MTHB.Get())
             using (var cpuTest = MSI_CPU.Get())
             using (var gpuTest = MSI_GPU.Get())
             {
@@ -55,6 +87,18 @@ namespace SubZero
                 {
                     //Not detected MSI laptop, show dialog to user
                     return;
+                }
+                if (biosInfo.Count == 0 || mthbInfo.Count == 0)
+                {
+                    //Huh, is this MSI Laptop? Inform user, but continue execution
+                    LaptopModel = "Unknown.Unknown";
+                }
+                else
+                {
+                    foreach (var item in mthbInfo) //Laptop model
+                        LaptopModel = $"{item.ToString()}.";
+                    foreach (var item in biosInfo) //Laptop BIOS
+                        LaptopModel += item.ToString();
                 }
             }
             if (File.Exists(configFileName)) //Do we have config?
@@ -64,15 +108,20 @@ namespace SubZero
                     var loadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(configFileName));
                     if (loadedSettings.Version != configFileVersion)
                     {
-                        //Show upgrade dialog to user
-                        //Upgrade config
+                        //TODO: Show upgrade dialog to user
+                        //TODO: Upgrade config
+                    }
+                    if (loadedSettings.ModelName != LaptopModel)
+                    {
+                        //TODO: Show upgrade Model Dialog to user
+                        //TODO: Upgrade config
                     }
                     ProcessSettings(loadedSettings);
                     return;
                 }
                 catch (JsonException)
                 {
-                    //Config file is not valid for some reason, show dialog to user
+                    //TODO: Config file is not valid for some reason, show dialog to user
                 }
             }
             //We dont have config, lets make one!
@@ -81,12 +130,17 @@ namespace SubZero
             Settings set = new Settings();
             set.Profiles = new Profile[] { profile, new Profile() { Name = "Factory", CPU = TemperatureSettings.FactoryCPU, GPU = TemperatureSettings.FactoryGPU } };
             set.Version = configFileVersion; //Set version
+            set.ModelName = LaptopModel;
             ProcessSettings(set);
         }
+        /// <summary>
+        /// Load Settings and display them
+        /// </summary>
+        /// <param name="settings">Settings to show</param>
         private void ProcessSettings(Settings settings)
         {
-            profilesList.Items.Clear();
-            foreach (var profile in settings.Profiles)
+            profilesList.Items.Clear(); //Clear current settings
+            foreach (var profile in settings.Profiles) //Add profiles
             {
                 ListBoxItem itemToAdd = new ListBoxItem();
                 TextBlock blockToAdd = new TextBlock();
@@ -98,21 +152,27 @@ namespace SubZero
 
                 profilesList.Items.Add(itemToAdd); //Add tab
             }
-            if (settings.Profiles.Length == 1)
+            if (settings.Profiles.Length == 1) //Is this only profile?
                 DeleteAllowed = false;
             else
                 DeleteAllowed = true;
         }
+        /// <summary>
+        /// Loads currently running system profile
+        /// </summary>
+        /// <returns>Profile system is running</returns>
         private Profile LoadCurrentSystemProfile()
         {
             TemperatureSettings cpuTemps = new TemperatureSettings();
             TemperatureSettings gpuTemps = new TemperatureSettings();
             int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
+            //Prepare WMI
             using (var cpuData = MSI_CPU.Get())
             using (var gpudata = MSI_GPU.Get())
             {
                 foreach (ManagementObject cpuValue in cpuData)
                 {
+                    //Load CPU values
                     switch (counter)
                     {
                         case 11:
@@ -139,6 +199,7 @@ namespace SubZero
                 counter = 0; //Reset for GPU
                 foreach (ManagementObject gpuValue in gpudata)
                 {
+                    //Load GPU Values
                     switch (counter)
                     {
                         case 11:
@@ -163,12 +224,16 @@ namespace SubZero
                     counter++;
                 }
             }
-            return new Profile() { CPU = cpuTemps, GPU = gpuTemps, Name = "Current" };
+            return new Profile() { CPU = cpuTemps, GPU = gpuTemps, Name = "Current" };//Return our new profile
         }
-
+        /// <summary>
+        /// Happens when profile TAB is changed, we need to load different settings
+        /// </summary>
+        /// <param name="sender">We are ignoring this param</param>
+        /// <param name="e">We are checking AddedItems as ListBoxItem</param>
         private void profilesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Add check if we have edited state
+            //TODO: Add check if we have edited state
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
             cpu1.Value = profileInfo.CPU.Value1 / 100;
             cpu2.Value = profileInfo.CPU.Value2 / 100;
@@ -186,22 +251,30 @@ namespace SubZero
 
             IsEdited = false;
         }
-
+        /// <summary>
+        /// This happens when slider changes, user edited something!
+        /// </summary>
         private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             IsEdited = true; //User made some change!
         }
 
+        /// <summary>
+        /// User pressed Discard!
+        /// </summary>
         private void discardButton_Click(object sender, RoutedEventArgs e)
         {
             profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
             {
-                profilesList.SelectedItem
+                profilesList.SelectedItem //Load back original item
             }));
         }
-
+        /// <summary>
+        /// Apply settings to laptop
+        /// </summary>
         private void applyButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: Check we have correct fan setting (Advanced, not simple)
             Profile appliedProfile = new Profile();
             appliedProfile.CPU = new TemperatureSettings();
             appliedProfile.GPU = new TemperatureSettings();
@@ -228,6 +301,7 @@ namespace SubZero
             {
                 foreach (ManagementObject cpuValue in cpuData)
                 {
+                    //Write CPU Fan speeds to PC
                     switch (counter)
                     {
                         case 11:
@@ -260,6 +334,7 @@ namespace SubZero
                 counter = 0; //Reset for GPU
                 foreach (ManagementObject gpuValue in gpudata)
                 {
+                    //Write GPU Fan speeds to PC
                     switch (counter)
                     {
                         case 11:
@@ -292,14 +367,17 @@ namespace SubZero
             }
             IsEdited = false; //Editation finished
         }
-
+        /// <summary>
+        /// User pressed save, apply and save XML
+        /// </summary>
         private void saveButton_Click(object sender, RoutedEventArgs e)
         {
             if (IsEdited)
                 applyButton_Click(sender, e); //Apply settings first
             Settings set = new Settings
             {
-                Version = configFileVersion
+                Version = configFileVersion,
+                ModelName = LaptopModel
             };
             List<Profile> profilesTemp = new List<Profile>();
             foreach (var item in profilesList.Items)
@@ -313,7 +391,7 @@ namespace SubZero
             }
             catch (IOException ex)
             {
-                //Saving failed, show user dialog
+                //TODO: Saving failed, show user dialog
             }
         }
     }

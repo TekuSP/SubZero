@@ -2,15 +2,39 @@
 
 namespace SubZero
 {
+    /// <summary>
+    /// Fan profiles for all six possible values
+    /// </summary>
     [Serializable]
     public class TemperatureSettings
     {
+        /// <summary>
+        /// MSI Fan Value 1
+        /// </summary>
         public double Value1 { get; set; }
+        /// <summary>
+        /// MSI Fan Value 2
+        /// </summary>
         public double Value2 { get; set; }
+        /// <summary>
+        /// MSI Fan Value 3
+        /// </summary>
         public double Value3 { get; set; }
+        /// <summary>
+        /// MSI Fan Value 4
+        /// </summary>
         public double Value4 { get; set; }
+        /// <summary>
+        /// MSI Fan Value 5
+        /// </summary>
         public double Value5 { get; set; }
+        /// <summary>
+        /// MSI Fan Value 6
+        /// </summary>
         public double Value6 { get; set; }
+        /// <summary>
+        /// Factory defaults for most laptops, for CPU Fan speeds
+        /// </summary>
         public static TemperatureSettings FactoryCPU => new TemperatureSettings()
         {
             Value1 = 0,
@@ -20,6 +44,9 @@ namespace SubZero
             Value5 = 64,
             Value6 = 72
         };
+        /// <summary>
+        /// Factory defaults for most laptops, for GPU Fan speeds
+        /// </summary>
         public static TemperatureSettings FactoryGPU => new TemperatureSettings()
         {
             Value1 = 0,
@@ -30,17 +57,42 @@ namespace SubZero
             Value6 = 84
         };
     }
+    /// <summary>
+    /// Global application settings to be saved in XML format
+    /// </summary>
     [Serializable]
     public class Settings
     {
+        /// <summary>
+        /// Used profiles, can never be null or empty array!
+        /// </summary>
         public Profile[] Profiles { get; set; }
+        /// <summary>
+        /// Version of settings, if older is detected, upgrade is required
+        /// </summary>
         public int Version { get; set; }
+        /// <summary>
+        /// Model of laptop where settings were generated, if different, user must be informed
+        /// </summary>
+        public string ModelName { get; set; }
     }
+    /// <summary>
+    /// Profile information
+    /// </summary>
     [Serializable]
     public class Profile
     {
+        /// <summary>
+        /// CPU Fan speeds
+        /// </summary>
         public TemperatureSettings CPU { get; set; }
+        /// <summary>
+        /// GPU Fan speeds
+        /// </summary>
         public TemperatureSettings GPU { get; set; }
+        /// <summary>
+        /// Name of the profile
+        /// </summary>
         public string Name { get; set; }
     }
 }
