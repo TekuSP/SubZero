@@ -88,8 +88,8 @@ namespace SubZero.Models
             MSI_Master_Battery = new ManagementObjectSearcher("root\\WMI", "SELECT Master_Battery FROM MSI_Master_Battery");
             MSI_Power = new ManagementObjectSearcher("root\\WMI", "SELECT Power FROM MSI_Power");
             MSI_LaptopModel = new ManagementObjectSearcher("root\\CIMV2", "SELECT Model FROM Win32_ComputerSystem");
-            WIN_PowerPlan = new ManagementObjectSearcher("root\\CIMV2\\power", "SELECT * FROM Win32_PowerPlan"); //???
-            WIN_DisplayConfig = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DisplayConfiguration"); //???
+            WIN_PowerPlan = new ManagementObjectSearcher("root\\CIMV2\\power", "SELECT * FROM Win32_PowerPlan"); //TODO: ???
+            WIN_DisplayConfig = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_DisplayConfiguration"); //TODO: ???
             //Test if they are valid
             using (ManagementObjectCollection test = MSI_CPU.Get())
             {
