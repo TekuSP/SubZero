@@ -86,23 +86,20 @@ namespace SubZero
         private void applyButton_Click(object sender, RoutedEventArgs e)
         {
             //TODO: Check we have correct fan setting (Advanced, not simple)
-            Profile appliedProfile = new Profile();
-            appliedProfile.CPU = new TemperatureSettings();
-            appliedProfile.GPU = new TemperatureSettings();
-            appliedProfile.Name = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile).Name;
-            appliedProfile.CPU.Value1 = Math.Round(cpu1.Value * 100);
-            appliedProfile.CPU.Value2 = Math.Round(cpu2.Value * 100);
-            appliedProfile.CPU.Value3 = Math.Round(cpu3.Value * 100);
-            appliedProfile.CPU.Value4 = Math.Round(cpu4.Value * 100);
-            appliedProfile.CPU.Value5 = Math.Round(cpu5.Value * 100);
-            appliedProfile.CPU.Value6 = Math.Round(cpu6.Value * 100);
+            Profile appliedProfile = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile);
+            appliedProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
+            appliedProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
+            appliedProfile.CPU.Value3.FanSpeed = (int)Math.Round(cpu3.Value * 100);
+            appliedProfile.CPU.Value4.FanSpeed = (int)Math.Round(cpu4.Value * 100);
+            appliedProfile.CPU.Value5.FanSpeed = (int)Math.Round(cpu5.Value * 100);
+            appliedProfile.CPU.Value6.FanSpeed = (int)Math.Round(cpu6.Value * 100);
 
-            appliedProfile.GPU.Value1 = Math.Round(gpu1.Value * 100);
-            appliedProfile.GPU.Value2 = Math.Round(gpu2.Value * 100);
-            appliedProfile.GPU.Value3 = Math.Round(gpu3.Value * 100);
-            appliedProfile.GPU.Value4 = Math.Round(gpu4.Value * 100);
-            appliedProfile.GPU.Value5 = Math.Round(gpu5.Value * 100);
-            appliedProfile.GPU.Value6 = Math.Round(gpu6.Value * 100);
+            appliedProfile.GPU.Value1.FanSpeed = (int)Math.Round(gpu1.Value * 100);
+            appliedProfile.GPU.Value2.FanSpeed = (int)Math.Round(gpu2.Value * 100);
+            appliedProfile.GPU.Value3.FanSpeed = (int)Math.Round(gpu3.Value * 100);
+            appliedProfile.GPU.Value4.FanSpeed = (int)Math.Round(gpu4.Value * 100);
+            appliedProfile.GPU.Value5.FanSpeed = (int)Math.Round(gpu5.Value * 100);
+            appliedProfile.GPU.Value6.FanSpeed = (int)Math.Round(gpu6.Value * 100);
 
             ((profilesList.SelectedItem as ListBoxItem)).Tag = appliedProfile; //Synchronize changes first
 
@@ -113,35 +110,36 @@ namespace SubZero
                 foreach (ManagementObject cpuValue in cpuData)
                 {
                     //Write CPU Fan speeds to PC
+                    //TODO: Write temperatures as well
                     switch (counter)
                     {
                         case 11:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value1);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value1.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 12:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value2);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value2.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 13:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value3);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value3.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 14:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value4);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value4.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 15:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value5);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value5.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 16:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value6);
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value6.FanSpeed);
                             cpuValue.Put();
                             break;
                     }
@@ -154,32 +152,32 @@ namespace SubZero
                     switch (counter)
                     {
                         case 11:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value1);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value1.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 12:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value2);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value2.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 13:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value3);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value3.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 14:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value4);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value4.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 15:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value5);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value5.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 16:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value6);
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value6.FanSpeed);
                             gpuValue.Put();
                             break;
                     }
@@ -234,28 +232,46 @@ namespace SubZero
                     //Load CPU values
                     switch (counter)
                     {
+                        case 4:
+                            cpuTemps.Value1.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
+                        case 5:
+                            cpuTemps.Value2.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
+                        case 6:
+                            cpuTemps.Value3.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
+                        case 7:
+                            cpuTemps.Value4.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
+                        case 8:
+                            cpuTemps.Value5.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
+                        case 9:
+                            cpuTemps.Value6.Temperature = Convert.ToInt32(cpuValue["CPU"]);
+                            break;
                         case 11:
-                            cpuTemps.Value1 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value1.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
 
                         case 12:
-                            cpuTemps.Value2 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value2.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
 
                         case 13:
-                            cpuTemps.Value3 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value3.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
 
                         case 14:
-                            cpuTemps.Value4 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value4.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
 
                         case 15:
-                            cpuTemps.Value5 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value5.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
 
                         case 16:
-                            cpuTemps.Value6 = double.Parse(cpuValue["CPU"].ToString());
+                            cpuTemps.Value6.FanSpeed = Convert.ToInt32(cpuValue["CPU"]);
                             break;
                     }
                     counter++;
@@ -266,28 +282,46 @@ namespace SubZero
                     //Load GPU Values
                     switch (counter)
                     {
+                        case 4:
+                            gpuTemps.Value1.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
+                        case 5:
+                            gpuTemps.Value2.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
+                        case 6:
+                            gpuTemps.Value3.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
+                        case 7:
+                            gpuTemps.Value4.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
+                        case 8:
+                            gpuTemps.Value5.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
+                        case 9:
+                            gpuTemps.Value6.Temperature = Convert.ToInt32(gpuValue["VGA"]);
+                            break;
                         case 11:
-                            gpuTemps.Value1 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value1.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
 
                         case 12:
-                            gpuTemps.Value2 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value2.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
 
                         case 13:
-                            gpuTemps.Value3 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value3.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
 
                         case 14:
-                            gpuTemps.Value4 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value4.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
 
                         case 15:
-                            gpuTemps.Value5 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value5.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
 
                         case 16:
-                            gpuTemps.Value6 = double.Parse(gpuValue["VGA"].ToString());
+                            gpuTemps.Value6.FanSpeed = Convert.ToInt32(gpuValue["VGA"]);
                             break;
                     }
                     counter++;
@@ -389,19 +423,19 @@ namespace SubZero
         {
             //TODO: Add check if we have edited state
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
-            cpu1.Value = profileInfo.CPU.Value1 / 100;
-            cpu2.Value = profileInfo.CPU.Value2 / 100;
-            cpu3.Value = profileInfo.CPU.Value3 / 100;
-            cpu4.Value = profileInfo.CPU.Value4 / 100;
-            cpu5.Value = profileInfo.CPU.Value5 / 100;
-            cpu6.Value = profileInfo.CPU.Value6 / 100;
+            cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100;
+            cpu2.Value = profileInfo.CPU.Value2.FanSpeed / 100;
+            cpu3.Value = profileInfo.CPU.Value3.FanSpeed / 100;
+            cpu4.Value = profileInfo.CPU.Value4.FanSpeed / 100;
+            cpu5.Value = profileInfo.CPU.Value5.FanSpeed / 100;
+            cpu6.Value = profileInfo.CPU.Value6.FanSpeed / 100;
 
-            gpu1.Value = profileInfo.GPU.Value1 / 100;
-            gpu2.Value = profileInfo.GPU.Value2 / 100;
-            gpu3.Value = profileInfo.GPU.Value3 / 100;
-            gpu4.Value = profileInfo.GPU.Value4 / 100;
-            gpu5.Value = profileInfo.GPU.Value5 / 100;
-            gpu6.Value = profileInfo.GPU.Value6 / 100;
+            gpu1.Value = profileInfo.GPU.Value1.FanSpeed / 100;
+            gpu2.Value = profileInfo.GPU.Value2.FanSpeed / 100;
+            gpu3.Value = profileInfo.GPU.Value3.FanSpeed / 100;
+            gpu4.Value = profileInfo.GPU.Value4.FanSpeed / 100;
+            gpu5.Value = profileInfo.GPU.Value5.FanSpeed / 100;
+            gpu6.Value = profileInfo.GPU.Value6.FanSpeed / 100;
 
             IsEdited = false;
             IsSaved = false;
