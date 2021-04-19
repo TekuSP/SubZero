@@ -15,6 +15,9 @@ using System.Management;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using MaterialDesignThemes.Wpf;
+using SubZero.Dialogs;
+using System.Threading.Tasks;
 
 namespace SubZero
 {
@@ -101,7 +104,6 @@ namespace SubZero
         /// </summary>
         private void applyButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Check we have correct fan setting (Advanced, not simple)
             Profile appliedProfile = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile);
             appliedProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
             appliedProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
@@ -206,9 +208,12 @@ namespace SubZero
         /// <summary>
         /// User pressed Discard!
         /// </summary>
-        private void discardButton_Click(object sender, RoutedEventArgs e)
+        private async void discardButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Warn user about Discarding unsaved changes
+            var dialog = YesNoDialog.ShowWarningDialog("Are you sure you want to discard?", () => { DialogHost.Close("mainDialog"); });
+            _ = await DialogHost.Show(dialog, "mainDialog");
+            if (!dialog.DialogResult)
+                return; //User said no
             profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
             {
                 profilesList.SelectedItem //Load back original item
@@ -218,9 +223,12 @@ namespace SubZero
         /// <summary>
         /// User pressed factory settings, load factory configs into current profile
         /// </summary>
-        private void factoryButton_Click(object sender, RoutedEventArgs e)
+        private async void factoryButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Warn user about Discarding unsaved changes
+            var dialog = YesNoDialog.ShowWarningDialog("Are you sure you want to load\nfactory defaults?", () => { DialogHost.Close("mainDialog"); });
+            _ = await DialogHost.Show(dialog, "mainDialog");
+            if (!dialog.DialogResult)
+                return; //User said no
             var current = (profilesList.SelectedItem as ListBoxItem);
             (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
             (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
@@ -567,8 +575,14 @@ namespace SubZero
         /// <summary>
         /// User pressed save, apply and save XML
         /// </summary>
-        private void saveButton_Click(object sender, RoutedEventArgs e)
+        private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
+            bool ourDialog = false;
+            if (!DialogHost.IsDialogOpen("mainDialog"))
+            {
+                _ = DialogHost.Show(new LoadingDialog("Saving..."), "mainDialog");
+                ourDialog = true;
+            }
             if (IsEdited)
                 applyButton_Click(sender, e); //Apply settings first
             List<Profile> profilesTemp = new List<Profile>();
@@ -581,6 +595,17 @@ namespace SubZero
             {
                 File.WriteAllText(configFileName, JsonConvert.SerializeObject(ApplicationSettings, Formatting.Indented)); //Try to save
                 IsSaved = true;
+                if (ourDialog)
+                {
+                    await Task.Run(() =>
+                    {
+                        Thread.Sleep(3000);
+                        saveButton.Dispatcher.Invoke(() =>
+                        {
+                            DialogHost.Close("mainDialog");
+                        });
+                    });
+                }
             }
             catch (IOException ex)
             {
@@ -599,9 +624,20 @@ namespace SubZero
 
         #endregion Private Methods
 
-        private void enabledSubZero_Click(object sender, RoutedEventArgs e)
+        private async void enabledSubZero_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: Show dialog so by enabling/disabling profile will be saved to HDD
+            if (enabledSubZero.IsChecked.GetValueOrDefault())
+            {
+                var dialog = YesNoDialog.ShowInformationDialog("Enabling profile will apply current settings and save them.\nDo you want to continue?", () => { DialogHost.Close("mainDialog"); });
+                _ = await DialogHost.Show(dialog, "mainDialog");
+                if (!dialog.DialogResult)
+                    return; //User said no
+                _ = DialogHost.Show(new LoadingDialog("Enabling..."), "mainDialog");
+            }
+            else
+            {
+                _ = DialogHost.Show(new LoadingDialog("Disabling..."), "mainDialog");
+            }
             saveButton_Click(sender, e);
             using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
             {
@@ -618,6 +654,19 @@ namespace SubZero
                 }
                 fanObject.Dispose();
             }
+            await Task.Run(() =>
+            {
+                Thread.Sleep(3000);
+                saveButton.Dispatcher.Invoke(() =>
+                {
+                    DialogHost.Close("mainDialog");
+                });
+            });
+        }
+
+        private async void settings_Click(object sender, RoutedEventArgs e)
+        {
+            _ = await DialogHost.Show(YesNoDialog.ShowErrorDialog("Fucked up", null), "mainDialog");
         }
     }
 }
