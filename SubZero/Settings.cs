@@ -3,35 +3,65 @@
 namespace SubZero
 {
     /// <summary>
+    /// Profile information
+    /// </summary>
+    [Serializable]
+    public class Profile
+    {
+        #region Public Properties
+
+        /// <summary>
+        /// CPU Fan speeds
+        /// </summary>
+        public TemperatureSettings CPU { get; set; }
+
+        /// <summary>
+        /// GPU Fan speeds
+        /// </summary>
+        public TemperatureSettings GPU { get; set; }
+
+        /// <summary>
+        /// Name of the profile
+        /// </summary>
+        public string Name { get; set; }
+
+        #endregion Public Properties
+    }
+
+    /// <summary>
+    /// Global application settings to be saved in XML format
+    /// </summary>
+    [Serializable]
+    public class Settings
+    {
+        #region Public Properties
+
+        /// <summary>
+        /// Model of laptop where settings were generated, if different, user must be informed
+        /// </summary>
+        public string ModelName { get; set; }
+
+        /// <summary>
+        /// Used profiles, can never be null or empty array!
+        /// </summary>
+        public Profile[] Profiles { get; set; }
+
+        /// <summary>
+        /// Version of settings, if older is detected, upgrade is required
+        /// </summary>
+        public int Version { get; set; }
+
+        #endregion Public Properties
+    }
+
+    /// <summary>
     /// Fan profiles for all six possible values
     /// </summary>
     [Serializable]
     public class TemperatureSettings
     {
-        /// <summary>
-        /// MSI Fan Value 1
-        /// </summary>
-        public double Value1 { get; set; }
-        /// <summary>
-        /// MSI Fan Value 2
-        /// </summary>
-        public double Value2 { get; set; }
-        /// <summary>
-        /// MSI Fan Value 3
-        /// </summary>
-        public double Value3 { get; set; }
-        /// <summary>
-        /// MSI Fan Value 4
-        /// </summary>
-        public double Value4 { get; set; }
-        /// <summary>
-        /// MSI Fan Value 5
-        /// </summary>
-        public double Value5 { get; set; }
-        /// <summary>
-        /// MSI Fan Value 6
-        /// </summary>
-        public double Value6 { get; set; }
+        #region Public Properties
+
         /// <summary>
         /// Factory defaults for most laptops, for CPU Fan speeds
         /// </summary>
@@ -44,6 +74,7 @@ namespace SubZero
             Value5 = 64,
             Value6 = 72
         };
+
         /// <summary>
         /// Factory defaults for most laptops, for GPU Fan speeds
         /// </summary>
@@ -56,43 +87,37 @@ namespace SubZero
             Value5 = 77,
             Value6 = 84
         };
-    }
-    /// <summary>
-    /// Global application settings to be saved in XML format
-    /// </summary>
-    [Serializable]
-    public class Settings
-    {
+
         /// <summary>
-        /// Used profiles, can never be null or empty array!
+        /// MSI Fan Value 1
         /// </summary>
-        public Profile[] Profiles { get; set; }
+        public double Value1 { get; set; }
+
         /// <summary>
-        /// Version of settings, if older is detected, upgrade is required
+        /// MSI Fan Value 2
         /// </summary>
-        public int Version { get; set; }
+        public double Value2 { get; set; }
+
         /// <summary>
-        /// Model of laptop where settings were generated, if different, user must be informed
+        /// MSI Fan Value 3
         /// </summary>
-        public string ModelName { get; set; }
-    }
-    /// <summary>
-    /// Profile information
-    /// </summary>
-    [Serializable]
-    public class Profile
-    {
+        public double Value3 { get; set; }
+
         /// <summary>
-        /// CPU Fan speeds
+        /// MSI Fan Value 4
         /// </summary>
-        public TemperatureSettings CPU { get; set; }
+        public double Value4 { get; set; }
+
         /// <summary>
-        /// GPU Fan speeds
+        /// MSI Fan Value 5
         /// </summary>
-        public TemperatureSettings GPU { get; set; }
+        public double Value5 { get; set; }
+
         /// <summary>
-        /// Name of the profile
+        /// MSI Fan Value 6
         /// </summary>
-        public string Name { get; set; }
+        public double Value6 { get; set; }
+
+        #endregion Public Properties
     }
 }

@@ -1,24 +1,16 @@
 using MaterialDesignExtensions.Controls;
+
+using Newtonsoft.Json;
+
 using SubZero.Resources;
+
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Management;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Newtonsoft.Json;
-using System.Management;
-using System.Diagnostics;
-using System.ComponentModel;
 
 namespace SubZero
 {
@@ -27,40 +19,32 @@ namespace SubZero
     /// </summary>
     public partial class MainWindow : MaterialWindow, INotifyPropertyChanged
     {
+        #region Private Fields
+
         /// <summary>
         /// Config file location
         /// </summary>
-        const string configFileName = "subzero.config";
+        private const string configFileName = "subzero.config";
+
         /// <summary>
         /// Version of config file
         /// </summary>
-        const int configFileVersion = 1;
+        private const int configFileVersion = 1;
+
         /// <summary>
         /// CPU WMI
         /// </summary>
         private ManagementObjectSearcher MSI_CPU;
+
         /// <summary>
         /// GPU WMI
         /// </summary>
         private ManagementObjectSearcher MSI_GPU;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        /// <summary>
-        /// Did user edit any settings?
-        /// </summary>
-        public bool IsEdited { get; set; } = false;
-        /// <summary>
-        /// Is current profile saved?
-        /// </summary>
-        public bool IsSaved { get; set; } = false;
-        /// <summary>
-        /// Can we delete this profile?
-        /// </summary>
-        public bool DeleteAllowed { get; set; }
-        /// <summary>
-        /// Laptop model we are running on
-        /// </summary>
-        public string LaptopModel { get; set; }
+        #endregion Private Fields
+
+        #region Public Constructors
+
         public MainWindow()
         {
             InitializeComponent();
@@ -69,6 +53,257 @@ namespace SubZero
             this.Icon = imgSource;
             this.TitleBarIcon = imgSource;
         }
+
+        #endregion Public Constructors
+
+        #region Public Events
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion Public Events
+
+        #region Public Properties
+
+        /// <summary>
+        /// Can we delete this profile?
+        /// </summary>
+        public bool DeleteAllowed { get; set; }
+
+        /// <summary>
+        /// Did user edit any settings?
+        /// </summary>
+        public bool IsEdited { get; set; } = false;
+
+        /// <summary>
+        /// Is current profile saved?
+        /// </summary>
+        public bool IsSaved { get; set; } = false;
+
+        /// <summary>
+        /// Laptop model we are running on
+        /// </summary>
+        public string LaptopModel { get; set; }
+
+        #endregion Public Properties
+
+        #region Private Methods
+
+        /// <summary>
+        /// Apply settings to laptop
+        /// </summary>
+        private void applyButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: Check we have correct fan setting (Advanced, not simple)
+            Profile appliedProfile = new Profile();
+            appliedProfile.CPU = new TemperatureSettings();
+            appliedProfile.GPU = new TemperatureSettings();
+            appliedProfile.Name = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile).Name;
+            appliedProfile.CPU.Value1 = Math.Round(cpu1.Value * 100);
+            appliedProfile.CPU.Value2 = Math.Round(cpu2.Value * 100);
+            appliedProfile.CPU.Value3 = Math.Round(cpu3.Value * 100);
+            appliedProfile.CPU.Value4 = Math.Round(cpu4.Value * 100);
+            appliedProfile.CPU.Value5 = Math.Round(cpu5.Value * 100);
+            appliedProfile.CPU.Value6 = Math.Round(cpu6.Value * 100);
+
+            appliedProfile.GPU.Value1 = Math.Round(gpu1.Value * 100);
+            appliedProfile.GPU.Value2 = Math.Round(gpu2.Value * 100);
+            appliedProfile.GPU.Value3 = Math.Round(gpu3.Value * 100);
+            appliedProfile.GPU.Value4 = Math.Round(gpu4.Value * 100);
+            appliedProfile.GPU.Value5 = Math.Round(gpu5.Value * 100);
+            appliedProfile.GPU.Value6 = Math.Round(gpu6.Value * 100);
+
+            ((profilesList.SelectedItem as ListBoxItem)).Tag = appliedProfile; //Synchronize changes first
+
+            int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
+            using (var cpuData = MSI_CPU.Get())
+            using (var gpudata = MSI_GPU.Get())
+            {
+                foreach (ManagementObject cpuValue in cpuData)
+                {
+                    //Write CPU Fan speeds to PC
+                    switch (counter)
+                    {
+                        case 11:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value1);
+                            cpuValue.Put();
+                            break;
+
+                        case 12:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value2);
+                            cpuValue.Put();
+                            break;
+
+                        case 13:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value3);
+                            cpuValue.Put();
+                            break;
+
+                        case 14:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value4);
+                            cpuValue.Put();
+                            break;
+
+                        case 15:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value5);
+                            cpuValue.Put();
+                            break;
+
+                        case 16:
+                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value6);
+                            cpuValue.Put();
+                            break;
+                    }
+                    counter++;
+                }
+                counter = 0; //Reset for GPU
+                foreach (ManagementObject gpuValue in gpudata)
+                {
+                    //Write GPU Fan speeds to PC
+                    switch (counter)
+                    {
+                        case 11:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value1);
+                            gpuValue.Put();
+                            break;
+
+                        case 12:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value2);
+                            gpuValue.Put();
+                            break;
+
+                        case 13:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value3);
+                            gpuValue.Put();
+                            break;
+
+                        case 14:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value4);
+                            gpuValue.Put();
+                            break;
+
+                        case 15:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value5);
+                            gpuValue.Put();
+                            break;
+
+                        case 16:
+                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value6);
+                            gpuValue.Put();
+                            break;
+                    }
+                    counter++;
+                }
+            }
+            IsEdited = false; //Editation finished
+        }
+
+        /// <summary>
+        /// User pressed Discard!
+        /// </summary>
+        private void discardButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: Warn user about Discarding unsaved changes
+            profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
+            {
+                profilesList.SelectedItem //Load back original item
+            }));
+        }
+
+        /// <summary>
+        /// User pressed factory settings, load factory configs into current profile
+        /// </summary>
+        private void factoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: Warn user about Discarding unsaved changes
+            var current = (profilesList.SelectedItem as ListBoxItem);
+            (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
+            (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
+            profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
+            {
+                 current//Load factory item
+            }));
+        }
+
+        /// <summary>
+        /// Loads currently running system profile
+        /// </summary>
+        /// <returns>Profile system is running</returns>
+        private Profile LoadCurrentSystemProfile()
+        {
+            TemperatureSettings cpuTemps = new TemperatureSettings();
+            TemperatureSettings gpuTemps = new TemperatureSettings();
+            int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
+            //Prepare WMI
+            using (var cpuData = MSI_CPU.Get())
+            using (var gpudata = MSI_GPU.Get())
+            {
+                foreach (ManagementObject cpuValue in cpuData)
+                {
+                    //Load CPU values
+                    switch (counter)
+                    {
+                        case 11:
+                            cpuTemps.Value1 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+
+                        case 12:
+                            cpuTemps.Value2 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+
+                        case 13:
+                            cpuTemps.Value3 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+
+                        case 14:
+                            cpuTemps.Value4 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+
+                        case 15:
+                            cpuTemps.Value5 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+
+                        case 16:
+                            cpuTemps.Value6 = double.Parse(cpuValue["CPU"].ToString());
+                            break;
+                    }
+                    counter++;
+                }
+                counter = 0; //Reset for GPU
+                foreach (ManagementObject gpuValue in gpudata)
+                {
+                    //Load GPU Values
+                    switch (counter)
+                    {
+                        case 11:
+                            gpuTemps.Value1 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+
+                        case 12:
+                            gpuTemps.Value2 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+
+                        case 13:
+                            gpuTemps.Value3 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+
+                        case 14:
+                            gpuTemps.Value4 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+
+                        case 15:
+                            gpuTemps.Value5 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+
+                        case 16:
+                            gpuTemps.Value6 = double.Parse(gpuValue["VGA"].ToString());
+                            break;
+                    }
+                    counter++;
+                }
+            }
+            return new Profile() { CPU = cpuTemps, GPU = gpuTemps, Name = "Current" };//Return our new profile
+        }
+
         /// <summary>
         /// Happens when rendering is done
         /// </summary>
@@ -131,6 +366,7 @@ namespace SubZero
             set.ModelName = LaptopModel;
             ProcessSettings(set);
         }
+
         /// <summary>
         /// Load Settings and display them
         /// </summary>
@@ -155,75 +391,7 @@ namespace SubZero
             else
                 DeleteAllowed = true;
         }
-        /// <summary>
-        /// Loads currently running system profile
-        /// </summary>
-        /// <returns>Profile system is running</returns>
-        private Profile LoadCurrentSystemProfile()
-        {
-            TemperatureSettings cpuTemps = new TemperatureSettings();
-            TemperatureSettings gpuTemps = new TemperatureSettings();
-            int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
-            //Prepare WMI
-            using (var cpuData = MSI_CPU.Get())
-            using (var gpudata = MSI_GPU.Get())
-            {
-                foreach (ManagementObject cpuValue in cpuData)
-                {
-                    //Load CPU values
-                    switch (counter)
-                    {
-                        case 11:
-                            cpuTemps.Value1 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                        case 12:
-                            cpuTemps.Value2 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                        case 13:
-                            cpuTemps.Value3 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                        case 14:
-                            cpuTemps.Value4 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                        case 15:
-                            cpuTemps.Value5 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                        case 16:
-                            cpuTemps.Value6 = double.Parse(cpuValue["CPU"].ToString());
-                            break;
-                    }
-                    counter++;
-                }
-                counter = 0; //Reset for GPU
-                foreach (ManagementObject gpuValue in gpudata)
-                {
-                    //Load GPU Values
-                    switch (counter)
-                    {
-                        case 11:
-                            gpuTemps.Value1 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                        case 12:
-                            gpuTemps.Value2 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                        case 13:
-                            gpuTemps.Value3 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                        case 14:
-                            gpuTemps.Value4 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                        case 15:
-                            gpuTemps.Value5 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                        case 16:
-                            gpuTemps.Value6 = double.Parse(gpuValue["VGA"].ToString());
-                            break;
-                    }
-                    counter++;
-                }
-            }
-            return new Profile() { CPU = cpuTemps, GPU = gpuTemps, Name = "Current" };//Return our new profile
-        }
+
         /// <summary>
         /// Happens when profile TAB is changed, we need to load different settings
         /// </summary>
@@ -250,124 +418,7 @@ namespace SubZero
             IsEdited = false;
             IsSaved = false;
         }
-        /// <summary>
-        /// This happens when slider changes, user edited something!
-        /// </summary>
-        private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-            IsEdited = true; //User made some change!
-            IsSaved = false;
-        }
 
-        /// <summary>
-        /// User pressed Discard!
-        /// </summary>
-        private void discardButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO: Warn user about Discarding unsaved changes
-            profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
-            {
-                profilesList.SelectedItem //Load back original item
-            }));
-        }
-        /// <summary>
-        /// Apply settings to laptop
-        /// </summary>
-        private void applyButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO: Check we have correct fan setting (Advanced, not simple)
-            Profile appliedProfile = new Profile();
-            appliedProfile.CPU = new TemperatureSettings();
-            appliedProfile.GPU = new TemperatureSettings();
-            appliedProfile.Name = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile).Name;
-            appliedProfile.CPU.Value1 = Math.Round(cpu1.Value * 100);
-            appliedProfile.CPU.Value2 = Math.Round(cpu2.Value * 100);
-            appliedProfile.CPU.Value3 = Math.Round(cpu3.Value * 100);
-            appliedProfile.CPU.Value4 = Math.Round(cpu4.Value * 100);
-            appliedProfile.CPU.Value5 = Math.Round(cpu5.Value * 100);
-            appliedProfile.CPU.Value6 = Math.Round(cpu6.Value * 100);
-
-            appliedProfile.GPU.Value1 = Math.Round(gpu1.Value * 100);
-            appliedProfile.GPU.Value2 = Math.Round(gpu2.Value * 100);
-            appliedProfile.GPU.Value3 = Math.Round(gpu3.Value * 100);
-            appliedProfile.GPU.Value4 = Math.Round(gpu4.Value * 100);
-            appliedProfile.GPU.Value5 = Math.Round(gpu5.Value * 100);
-            appliedProfile.GPU.Value6 = Math.Round(gpu6.Value * 100);
-
-            ((profilesList.SelectedItem as ListBoxItem)).Tag = appliedProfile; //Synchronize changes first
-
-            int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
-            using (var cpuData = MSI_CPU.Get())
-            using (var gpudata = MSI_GPU.Get())
-            {
-                foreach (ManagementObject cpuValue in cpuData)
-                {
-                    //Write CPU Fan speeds to PC
-                    switch (counter)
-                    {
-                        case 11:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value1);
-                            cpuValue.Put();
-                            break;
-                        case 12:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value2);
-                            cpuValue.Put();
-                            break;
-                        case 13:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value3);
-                            cpuValue.Put();
-                            break;
-                        case 14:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value4);
-                            cpuValue.Put();
-                            break;
-                        case 15:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value5);
-                            cpuValue.Put();
-                            break;
-                        case 16:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value6);
-                            cpuValue.Put();
-                            break;
-                    }
-                    counter++;
-                }
-                counter = 0; //Reset for GPU
-                foreach (ManagementObject gpuValue in gpudata)
-                {
-                    //Write GPU Fan speeds to PC
-                    switch (counter)
-                    {
-                        case 11:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value1);
-                            gpuValue.Put();
-                            break;
-                        case 12:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value2);
-                            gpuValue.Put();
-                            break;
-                        case 13:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value3);
-                            gpuValue.Put();
-                            break;
-                        case 14:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value4);
-                            gpuValue.Put();
-                            break;
-                        case 15:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value5);
-                            gpuValue.Put();
-                            break;
-                        case 16:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value6);
-                            gpuValue.Put();
-                            break;
-                    }
-                    counter++;
-                }
-            }
-            IsEdited = false; //Editation finished
-        }
         /// <summary>
         /// User pressed save, apply and save XML
         /// </summary>
@@ -396,19 +447,16 @@ namespace SubZero
                 //TODO: Saving failed, show user dialog
             }
         }
+
         /// <summary>
-        /// User pressed factory settings, load factory configs into current profile
+        /// This happens when slider changes, user edited something!
         /// </summary>
-        private void factoryButton_Click(object sender, RoutedEventArgs e)
+        private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            //TODO: Warn user about Discarding unsaved changes
-            var current = (profilesList.SelectedItem as ListBoxItem);
-            (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
-            (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
-            profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
-            {
-                 current//Load factory item
-            }));
+            IsEdited = true; //User made some change!
+            IsSaved = false;
         }
+
+        #endregion Private Methods
     }
 }
