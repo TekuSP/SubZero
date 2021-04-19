@@ -42,6 +42,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Dialogs\YesNoDialog - Copy - Copy.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>YesNoDialog - Copy.xaml.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Dialogs\YesNoDialog - Copy.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>YesNoDialog.xaml.cs</DependentUpon>
+    </Compile>
     <Compile Update="Resources\DesignSource.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

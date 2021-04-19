@@ -88,7 +88,7 @@ namespace SubZero
         /// <summary>
         /// Is current profile saved?
         /// </summary>
-        public bool IsSaved { get; set; } = false;
+        public bool IsSaved { get; set; } = true;
 
         /// <summary>
         /// Laptop model we are running on
@@ -369,7 +369,7 @@ namespace SubZero
         /// <summary>
         /// Happens when rendering is done
         /// </summary>
-        private void MaterialWindow_Loaded(object sender, RoutedEventArgs e)
+        private async void MaterialWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //Window is Loaded, start initialization, load Managment Objects
             MSIWmiHelper = new MSIWmiHelper();
@@ -399,20 +399,34 @@ namespace SubZero
                     var loadedSettings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(configFileName));
                     if (loadedSettings.Version != configFileVersion)
                     {
-                        //TODO: Show upgrade dialog to user
-                        //TODO: Upgrade config
+                        var dialog = YesNoDialog.ShowWarningDialog($"Current version of application uses version {configFileVersion},but configuration you are trying to load has version {loadedSettings.Version}. Do you want to upgrade configuration (Will require restart of application)?", () => { DialogHost.Close("mainDialog"); });
+                        _ = await DialogHost.Show(dialog, "mainDialog");
+                        if (!dialog.DialogResult)
+                            Environment.Exit(1); //User said no
+                        ApplicationSettings = loadedSettings;
+                        ApplicationSettings.Version = configFileVersion;
+                        saveButton_Click(sender, e);
+                        Environment.Exit(0);
                     }
                     if (loadedSettings.ModelName != LaptopModel)
                     {
-                        //TODO: Show upgrade Model Dialog to user
-                        //TODO: Upgrade config
+                        var dialog = YesNoDialog.ShowWarningDialog($"Currently loading configuration is for laptop {loadedSettings.ModelName} but you have {LaptopModel}. Do you want to upgrade configuration (Will require restart of application)?", () => { DialogHost.Close("mainDialog"); });
+                        _ = await DialogHost.Show(dialog, "mainDialog");
+                        if (!dialog.DialogResult)
+                            Environment.Exit(1); //User said no
+                        ApplicationSettings = loadedSettings;
+                        ApplicationSettings.ModelName = LaptopModel;
+                        saveButton_Click(sender, e);
+                        Environment.Exit(0);
                     }
                     ProcessSettings(loadedSettings);
                     return;
                 }
                 catch (JsonException)
                 {
-                    //TODO: Config file is not valid for some reason, show dialog to user
+                    var dialog = OKDialog.ShowErrorDialog($"Configuration file subzero.config is corrupted. Please repair or delete the file. Application cannot continue.", () => { DialogHost.Close("mainDialog"); });
+                    _ = await DialogHost.Show(dialog, "mainDialog");
+                    Environment.Exit(2); //User said no
                 }
             }
             //We dont have config, lets make one!
@@ -513,9 +527,21 @@ namespace SubZero
         /// </summary>
         /// <param name="sender">We are ignoring this param</param>
         /// <param name="e">We are checking AddedItems as ListBoxItem</param>
-        private void profilesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void profilesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //TODO: Add check if we have edited state
+            if (!DialogHost.IsDialogOpen("mainDialog"))
+            {
+                if (!IsSaved)
+                {
+                    var dialog = YesNoDialog.ShowWarningDialog("You have unsaved data which will be lost.\nDo you want to save first?", () => { DialogHost.Close("mainDialog"); });
+                    _ = await DialogHost.Show(dialog, "mainDialog");
+                    if (dialog.DialogResult)
+                    {
+                        saveButton_Click(sender, new RoutedEventArgs(e.RoutedEvent)); //Save first
+                    }
+                }
+            }
             if (e.AddedItems.Count == 0)
                 return;
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
@@ -569,7 +595,6 @@ namespace SubZero
 
 
             IsEdited = false;
-            IsSaved = false;
         }
 
         /// <summary>
@@ -590,7 +615,8 @@ namespace SubZero
             {
                 profilesTemp.Add(((item as ListBoxItem).Tag as Profile));
             }
-            ApplicationSettings.Profiles = profilesTemp.ToArray();
+            if (profilesTemp.Count > 0)
+                ApplicationSettings.Profiles = profilesTemp.ToArray();
             try
             {
                 File.WriteAllText(configFileName, JsonConvert.SerializeObject(ApplicationSettings, Formatting.Indented)); //Try to save
@@ -606,10 +632,13 @@ namespace SubZero
                         });
                     });
                 }
+                IsSaved = true;
             }
-            catch (IOException ex)
+            catch (IOException)
             {
-                //TODO: Saving failed, show user dialog
+                if (DialogHost.IsDialogOpen("mainDialog"))
+                    DialogHost.Close("mainDialog");
+                await DialogHost.Show(OKDialog.ShowWarningDialog("Saving data to drive failed. Is file open or disk full?", () => { DialogHost.Close("mainDialog"); }), "mainDialog");
             }
         }
 
