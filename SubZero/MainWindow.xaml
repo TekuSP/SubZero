@@ -28,6 +28,14 @@
             <ToolBar
                 Style="{DynamicResource MaterialDesignToolBar}"
                 ClipToBounds="False">
+                <ToggleButton Style="{StaticResource MaterialDesignSwitchToggleButton}" ToolTip="Enable or Disable SubZero Fan Control" x:Name="enabledSubZero" Click="enabledSubZero_Click">
+                    <materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
+                        <SolidColorBrush Color="Green" />
+                    </materialDesign:ToggleButtonAssist.SwitchTrackOnBackground>
+                    <materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
+                        <SolidColorBrush Color="Red" />
+                    </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
+                </ToggleButton>
                 <Button ToolTip="Open settings" x:Name="settings" Content="{materialDesign:PackIcon Kind=Settings}" />
                 <Button ToolTip="Add new profile" x:Name="newProfile" Content="{materialDesign:PackIcon Kind=PlusBox}" />
                 <Button ToolTip="Remove selected profile" IsEnabled="{Binding DeleteAllowed, UpdateSourceTrigger=PropertyChanged}" x:Name="removeProfile" Content="{materialDesign:PackIcon Kind=MinusBox}" />

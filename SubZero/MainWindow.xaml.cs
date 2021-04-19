@@ -12,6 +12,7 @@ using System.IO;
 using System.Management;
 using System.Windows;
 using System.Windows.Controls;
+using System.Linq;
 
 namespace SubZero
 {
@@ -370,7 +371,7 @@ namespace SubZero
                 else
                 {
                     foreach (ManagementObject item in mthbInfo) //Laptop model
-                        LaptopModel = $"{item["Model"]} ";
+                        LaptopModel = $"{item["Model"]}";
                 }
             }
             if (File.Exists(configFileName)) //Do we have config?
@@ -412,6 +413,22 @@ namespace SubZero
         /// <param name="settings">Settings to show</param>
         private void ProcessSettings(Settings settings)
         {
+            enabledSubZero.IsChecked = settings.TurnedOn;
+            using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
+            {
+                var fanObject = system.Cast<ManagementObject>().ElementAt(9);
+                if (settings.TurnedOn)
+                {
+                    fanObject.SetPropertyValue("System",((Convert.ToInt32(fanObject["System"]) | 128) & 191));
+                    fanObject.Put();
+                }
+                else
+                {
+                    fanObject.SetPropertyValue("System", (Convert.ToInt32(fanObject["System"]) & 63));
+                    fanObject.Put();
+                }
+                fanObject.Dispose();
+            }
             profilesList.Items.Clear(); //Clear current settings
             foreach (var profile in settings.Profiles) //Add profiles
             {
@@ -468,7 +485,8 @@ namespace SubZero
             Settings set = new Settings
             {
                 Version = configFileVersion,
-                ModelName = LaptopModel
+                ModelName = LaptopModel,
+                TurnedOn = enabledSubZero.IsChecked.GetValueOrDefault()
             };
             List<Profile> profilesTemp = new List<Profile>();
             foreach (var item in profilesList.Items)
@@ -478,7 +496,7 @@ namespace SubZero
             set.Profiles = profilesTemp.ToArray();
             try
             {
-                File.WriteAllText(configFileName, JsonConvert.SerializeObject(set)); //Try to save
+                File.WriteAllText(configFileName, JsonConvert.SerializeObject(set, Formatting.Indented)); //Try to save
                 IsSaved = true;
             }
             catch (IOException ex)
@@ -497,5 +515,26 @@ namespace SubZero
         }
 
         #endregion Private Methods
+
+        private void enabledSubZero_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: Show dialog so by enabling/disabling profile will be saved to HDD
+            saveButton_Click(sender, e);
+            using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
+            {
+                var fanObject = system.Cast<ManagementObject>().ElementAt(9);
+                if (enabledSubZero.IsChecked.GetValueOrDefault())
+                {
+                    fanObject.SetPropertyValue("System", ((Convert.ToInt32(fanObject["System"]) | 128) & 191));
+                    fanObject.Put();
+                }
+                else
+                {
+                    fanObject.SetPropertyValue("System", (Convert.ToInt32(fanObject["System"]) & 63));
+                    fanObject.Put();
+                }
+                fanObject.Dispose();
+            }
+        }
     }
 }

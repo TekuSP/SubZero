@@ -51,6 +51,7 @@ namespace SubZero.Models
             Profiles = new Profile[0];
             FanPollingSpeed = 500;
             TemperaturePollingSpeed = 500;
+            TurnedOn = false;
         }
 
         #endregion Public Constructors
@@ -81,6 +82,11 @@ namespace SubZero.Models
         /// Version of settings, if older is detected, upgrade is required
         /// </summary>
         public int Version { get; set; }
+
+        /// <summary>
+        /// Is SubZero active?
+        /// </summary>
+        public bool TurnedOn { get; set; }
 
         #endregion Public Properties
     }
