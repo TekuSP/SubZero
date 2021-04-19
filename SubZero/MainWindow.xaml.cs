@@ -1,4 +1,4 @@
-﻿using MaterialDesignExtensions.Controls;
+using MaterialDesignExtensions.Controls;
 using SubZero.Resources;
 using System;
 using System.Collections.Generic;
@@ -61,8 +61,6 @@ namespace SubZero
         /// Laptop model we are running on
         /// </summary>
         public string LaptopModel { get; set; }
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -79,10 +77,8 @@ namespace SubZero
             //Window is Loaded, start initialization, load Managment Objects
             MSI_CPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_CPU");
             MSI_GPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_VGA");
-            var MSI_BIOS = new ManagementObjectSearcher("root\\CIMV2", "SELECT SMBIOSBIOSVersion FROM WIN32_BIOS");
             var MSI_MTHB = new ManagementObjectSearcher("root\\CIMV2", "SELECT Model FROM Win32_ComputerSystem");
             //Disposable, test components if we are on MSI laptop
-            using (var biosInfo = MSI_BIOS.Get())
             using (var mthbInfo = MSI_MTHB.Get())
             using (var cpuTest = MSI_CPU.Get())
             using (var gpuTest = MSI_GPU.Get())
@@ -92,17 +88,15 @@ namespace SubZero
                     //Not detected MSI laptop, show dialog to user
                     return;
                 }
-                if (biosInfo.Count == 0 || mthbInfo.Count == 0)
+                if (mthbInfo.Count == 0)
                 {
                     //Huh, is this MSI Laptop? Inform user, but continue execution
-                    LaptopModel = "Unknown.Unknown";
+                    LaptopModel = "Unknown";
                 }
                 else
                 {
-                    foreach (var item in mthbInfo) //Laptop model
-                        LaptopModel = $"{item}.";
-                    foreach (var item in biosInfo) //Laptop BIOS
-                        LaptopModel += item.ToString();
+                    foreach (ManagementObject item in mthbInfo) //Laptop model
+                        LaptopModel = $"{item["Model"]} ";
                 }
             }
             if (File.Exists(configFileName)) //Do we have config?
@@ -270,6 +264,7 @@ namespace SubZero
         /// </summary>
         private void discardButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: Warn user about Discarding unsaved changes
             profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
             {
                 profilesList.SelectedItem //Load back original item
@@ -406,6 +401,7 @@ namespace SubZero
         /// </summary>
         private void factoryButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO: Warn user about Discarding unsaved changes
             var current = (profilesList.SelectedItem as ListBoxItem);
             (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
             (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
