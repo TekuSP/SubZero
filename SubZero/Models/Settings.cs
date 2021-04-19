@@ -49,9 +49,9 @@ namespace SubZero.Models
         public Settings()
         {
             Profiles = new Profile[0];
-            FanPollingSpeed = 500;
-            TemperaturePollingSpeed = 500;
+            PollingSpeed = 1000;
             TurnedOn = false;
+            UseCelsius = true;
         }
 
         #endregion Public Constructors
@@ -59,14 +59,14 @@ namespace SubZero.Models
         #region Public Properties
 
         /// <summary>
-        /// Polling speed of fans RPM in milliseconds
-        /// </summary>
-        public int FanPollingSpeed { get; set; }
-
-        /// <summary>
         /// Model of laptop where settings were generated, if different, user must be informed
         /// </summary>
         public string ModelName { get; set; }
+
+        /// <summary>
+        /// Polling speed in milliseconds
+        /// </summary>
+        public int PollingSpeed { get; set; }
 
         /// <summary>
         /// Used profiles, can never be null or empty array!
@@ -74,19 +74,19 @@ namespace SubZero.Models
         public Profile[] Profiles { get; set; }
 
         /// <summary>
-        /// Polling speed of temperatures in milliseconds
+        /// Is SubZero active?
         /// </summary>
-        public int TemperaturePollingSpeed { get; set; }
+        public bool TurnedOn { get; set; }
+
+        /// <summary>
+        /// Use Celsius or Fahrenheit?
+        /// </summary>
+        public bool UseCelsius { get; set; }
 
         /// <summary>
         /// Version of settings, if older is detected, upgrade is required
         /// </summary>
         public int Version { get; set; }
-
-        /// <summary>
-        /// Is SubZero active?
-        /// </summary>
-        public bool TurnedOn { get; set; }
 
         #endregion Public Properties
     }

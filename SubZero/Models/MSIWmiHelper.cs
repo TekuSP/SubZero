@@ -32,7 +32,7 @@ namespace SubZero.Models
             using (ManagementObjectCollection test = MSI_AP.Get())
             {
                 IsAvailableMSI_AP = test.Count != 0;
-            }            
+            }
             using (ManagementObjectCollection test = MSI_LaptopModel.Get())
             {
                 IsAvailableMSI_LaptopModel = test.Count != 0;

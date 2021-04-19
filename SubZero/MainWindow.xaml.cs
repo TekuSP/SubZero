@@ -9,11 +9,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Management;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Linq;
-using System.Threading;
 
 namespace SubZero
 {
@@ -26,8 +26,10 @@ namespace SubZero
         public string GPUTemperature { get; set; }
         public string CPURPM { get; set; }
         public string GPURPM { get; set; }
-        private bool temperatureInCelsius = true; //TODO: Move to better place
         private MSIHardwareMonitor HardwareMonitor { get; set; }
+        public Settings ApplicationSettings { get; set; }
+        public Profile ActiveProfile { get; set; }
+
         #region Private Fields
 
         /// <summary>
@@ -407,10 +409,12 @@ namespace SubZero
             //We dont have config, lets make one!
             var profile = LoadCurrentSystemProfile(); //Load what we have in System now
             //Initialize Settings
-            Settings set = new Settings();
-            set.Profiles = new Profile[] { profile, new Profile() { Name = "Factory", CPU = TemperatureSettings.FactoryCPU, GPU = TemperatureSettings.FactoryGPU } };
-            set.Version = configFileVersion; //Set version
-            set.ModelName = LaptopModel;
+            Settings set = new Settings
+            {
+                Profiles = new Profile[] { profile, new Profile() { Name = "Factory", CPU = TemperatureSettings.FactoryCPU, GPU = TemperatureSettings.FactoryGPU } },
+                Version = configFileVersion, //Set version
+                ModelName = LaptopModel
+            };
             ProcessSettings(set);
         }
 
@@ -420,24 +424,12 @@ namespace SubZero
         /// <param name="settings">Settings to show</param>
         private void ProcessSettings(Settings settings)
         {
+            //Initialize global settings based on incoming data
+            ApplicationSettings = settings;
             //Let's start sensors first
             HardwareMonitor = new MSIHardwareMonitor(MSIWmiHelper);
             //Let's start update Thread
-            Thread updateThread = new Thread(() =>
-            {
-                while (true)
-                {
-                    HardwareMonitor.FanController.RefreshFans();
-                    var rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.CPUFan);
-                    CPURPM = rpm == -1 ? "N/A" : $"{rpm}";
-                    rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.GPUFan);
-                    GPURPM = rpm == -1 ? "N/A" : $"{rpm}";
-                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureCelsius()} °C";
-                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureCelsius()} °C";
-                    Thread.Sleep(1000);
-                }
-            })
-            { IsBackground = true, Name = "FanAndTemperatureUpdateThread" };
+            Thread updateThread = new Thread(TemperatureAndFanThread) { IsBackground = true, Name = "FanAndTemperatureUpdateThread" };
             updateThread.Start();
             //Now check what state we should have, Auto or SubZero?
             enabledSubZero.IsChecked = settings.TurnedOn;
@@ -446,7 +438,7 @@ namespace SubZero
                 var fanObject = system.Cast<ManagementObject>().ElementAt(9);
                 if (settings.TurnedOn)
                 {
-                    fanObject.SetPropertyValue("System",((Convert.ToInt32(fanObject["System"]) | 128) & 191));
+                    fanObject.SetPropertyValue("System", ((Convert.ToInt32(fanObject["System"]) | 128) & 191));
                     fanObject.Put();
                 }
                 else
@@ -477,6 +469,37 @@ namespace SubZero
         }
 
         /// <summary>
+        /// This is way to stop <see cref="TemperatureAndFanThread"/>
+        /// </summary>
+        private bool runTemperatureAndFanThread = true;
+
+        /// <summary>
+        /// This is dedicated thread method for measuring RPM and Temperatures
+        /// </summary>
+        private void TemperatureAndFanThread()
+        {
+            while (runTemperatureAndFanThread)
+            {
+                HardwareMonitor.FanController.RefreshFans();
+                var rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.CPUFan);
+                CPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.GPUFan);
+                GPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                if (ApplicationSettings.UseCelsius)
+                {
+                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureCelsius()} °C";
+                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureCelsius()} °C";
+                }
+                else
+                {
+                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureFahrenheit()} °F";
+                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureFahrenheit()} °F";
+                }
+                Thread.Sleep(1000);
+            }
+        }
+
+        /// <summary>
         /// Happens when profile TAB is changed, we need to load different settings
         /// </summary>
         /// <param name="sender">We are ignoring this param</param>
@@ -485,6 +508,7 @@ namespace SubZero
         {
             //TODO: Add check if we have edited state
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
+            ActiveProfile = profileInfo; //Set active profile to real value
             cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100d;
             cpu2.Value = profileInfo.CPU.Value2.FanSpeed / 100d;
             cpu3.Value = profileInfo.CPU.Value3.FanSpeed / 100d;
@@ -510,21 +534,15 @@ namespace SubZero
         {
             if (IsEdited)
                 applyButton_Click(sender, e); //Apply settings first
-            Settings set = new Settings
-            {
-                Version = configFileVersion,
-                ModelName = LaptopModel,
-                TurnedOn = enabledSubZero.IsChecked.GetValueOrDefault()
-            };
             List<Profile> profilesTemp = new List<Profile>();
             foreach (var item in profilesList.Items)
             {
                 profilesTemp.Add(((item as ListBoxItem).Tag as Profile));
             }
-            set.Profiles = profilesTemp.ToArray();
+            ApplicationSettings.Profiles = profilesTemp.ToArray();
             try
             {
-                File.WriteAllText(configFileName, JsonConvert.SerializeObject(set, Formatting.Indented)); //Try to save
+                File.WriteAllText(configFileName, JsonConvert.SerializeObject(ApplicationSettings, Formatting.Indented)); //Try to save
                 IsSaved = true;
             }
             catch (IOException ex)
