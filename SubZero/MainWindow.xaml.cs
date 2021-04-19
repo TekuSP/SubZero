@@ -508,6 +508,8 @@ namespace SubZero
         private void profilesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //TODO: Add check if we have edited state
+            if (e.AddedItems.Count == 0)
+                return;
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
             ActiveProfile = profileInfo; //Set active profile to real value
             cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100d;
