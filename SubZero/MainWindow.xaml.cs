@@ -50,6 +50,10 @@ namespace SubZero
         /// </summary>
         public bool IsEdited { get; set; } = false;
         /// <summary>
+        /// Is current profile saved?
+        /// </summary>
+        public bool IsSaved { get; set; } = false;
+        /// <summary>
         /// Can we delete this profile?
         /// </summary>
         public bool DeleteAllowed { get; set; }
@@ -96,7 +100,7 @@ namespace SubZero
                 else
                 {
                     foreach (var item in mthbInfo) //Laptop model
-                        LaptopModel = $"{item.ToString()}.";
+                        LaptopModel = $"{item}.";
                     foreach (var item in biosInfo) //Laptop BIOS
                         LaptopModel += item.ToString();
                 }
@@ -250,6 +254,7 @@ namespace SubZero
             gpu6.Value = profileInfo.GPU.Value6 / 100;
 
             IsEdited = false;
+            IsSaved = false;
         }
         /// <summary>
         /// This happens when slider changes, user edited something!
@@ -257,6 +262,7 @@ namespace SubZero
         private void slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             IsEdited = true; //User made some change!
+            IsSaved = false;
         }
 
         /// <summary>
@@ -388,11 +394,25 @@ namespace SubZero
             try
             {
                 File.WriteAllText(configFileName, JsonConvert.SerializeObject(set)); //Try to save
+                IsSaved = true;
             }
             catch (IOException ex)
             {
                 //TODO: Saving failed, show user dialog
             }
+        }
+        /// <summary>
+        /// User pressed factory settings, load factory configs into current profile
+        /// </summary>
+        private void factoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var current = (profilesList.SelectedItem as ListBoxItem);
+            (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
+            (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
+            profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
+            {
+                 current//Load factory item
+            }));
         }
     }
 }

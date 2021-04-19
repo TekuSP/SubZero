@@ -355,13 +355,15 @@
             <Grid Margin="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100px" />
+                    <ColumnDefinition Width="100px" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="100px" />
                     <ColumnDefinition Width="100px" />
                 </Grid.ColumnDefinitions>
                 <Button Content="Discard" Width="85" IsEnabled="{Binding IsEdited, UpdateSourceTrigger=PropertyChanged}" Click="discardButton_Click" IsCancel="True" x:Name="discardButton" Style="{StaticResource MaterialDesignRaisedAccentButton}" TabIndex="1" ToolTip="Discard all changes" />
-                <Button Content="Apply" IsEnabled="{Binding IsEdited, UpdateSourceTrigger=PropertyChanged}" Click="applyButton_Click" Width="85" Grid.Column="2" x:Name="applyButton" Style="{StaticResource MaterialDesignRaisedLightButton}" TabIndex="2" ToolTip="Apply changes, but do not save" />
-                <Button Content="Save" Click="saveButton_Click" IsDefault="True" Width="85" Grid.Column="3" x:Name="saveButton" Style="{StaticResource MaterialDesignRaisedDarkButton}" TabIndex="3" ToolTip="Save changes" />
+                <Button Content="Factory" Width="85" Click="factoryButton_Click" IsCancel="True" x:Name="factoryButton" Style="{StaticResource MaterialDesignRaisedAccentButton}" Grid.Column="1" TabIndex="1" ToolTip="Discard all changes" />
+                <Button Content="Apply" IsEnabled="{Binding IsEdited, UpdateSourceTrigger=PropertyChanged}" Click="applyButton_Click" Width="85" Grid.Column="3" x:Name="applyButton" Style="{StaticResource MaterialDesignRaisedLightButton}" TabIndex="2" ToolTip="Apply changes, but do not save" />
+                <Button Content="Save" Click="saveButton_Click" IsDefault="True" Width="85" Grid.Column="4" x:Name="saveButton" Style="{StaticResource MaterialDesignRaisedDarkButton}" TabIndex="3" ToolTip="Save changes" />
             </Grid>
         </materialDesign:Card>
     </Grid>
