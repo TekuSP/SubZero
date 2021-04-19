@@ -440,19 +440,19 @@ namespace SubZero
         {
             //TODO: Add check if we have edited state
             var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
-            cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100;
-            cpu2.Value = profileInfo.CPU.Value2.FanSpeed / 100;
-            cpu3.Value = profileInfo.CPU.Value3.FanSpeed / 100;
-            cpu4.Value = profileInfo.CPU.Value4.FanSpeed / 100;
-            cpu5.Value = profileInfo.CPU.Value5.FanSpeed / 100;
-            cpu6.Value = profileInfo.CPU.Value6.FanSpeed / 100;
+            cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100d;
+            cpu2.Value = profileInfo.CPU.Value2.FanSpeed / 100d;
+            cpu3.Value = profileInfo.CPU.Value3.FanSpeed / 100d;
+            cpu4.Value = profileInfo.CPU.Value4.FanSpeed / 100d;
+            cpu5.Value = profileInfo.CPU.Value5.FanSpeed / 100d;
+            cpu6.Value = profileInfo.CPU.Value6.FanSpeed / 100d;
 
-            gpu1.Value = profileInfo.GPU.Value1.FanSpeed / 100;
-            gpu2.Value = profileInfo.GPU.Value2.FanSpeed / 100;
-            gpu3.Value = profileInfo.GPU.Value3.FanSpeed / 100;
-            gpu4.Value = profileInfo.GPU.Value4.FanSpeed / 100;
-            gpu5.Value = profileInfo.GPU.Value5.FanSpeed / 100;
-            gpu6.Value = profileInfo.GPU.Value6.FanSpeed / 100;
+            gpu1.Value = profileInfo.GPU.Value1.FanSpeed / 100d;
+            gpu2.Value = profileInfo.GPU.Value2.FanSpeed / 100d;
+            gpu3.Value = profileInfo.GPU.Value3.FanSpeed / 100d;
+            gpu4.Value = profileInfo.GPU.Value4.FanSpeed / 100d;
+            gpu5.Value = profileInfo.GPU.Value5.FanSpeed / 100d;
+            gpu6.Value = profileInfo.GPU.Value6.FanSpeed / 100d;
 
             IsEdited = false;
             IsSaved = false;
