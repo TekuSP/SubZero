@@ -15,6 +15,7 @@
     <Copyright>Copyright 2021 Richard "TekuSP" Torhan</Copyright>
     <PackageIcon>logo-icon.png</PackageIcon>
     <NeutralLanguage>en</NeutralLanguage>
+    <ApplicationIcon>Resources\logo-icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
