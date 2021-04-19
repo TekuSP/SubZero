@@ -13,6 +13,7 @@ using System.Management;
 using System.Windows;
 using System.Windows.Controls;
 using System.Linq;
+using System.Threading;
 
 namespace SubZero
 {
@@ -21,6 +22,12 @@ namespace SubZero
     /// </summary>
     public partial class MainWindow : MaterialWindow, INotifyPropertyChanged
     {
+        public string CPUTemperature { get; set; }
+        public string GPUTemperature { get; set; }
+        public string CPURPM { get; set; }
+        public string GPURPM { get; set; }
+        private bool temperatureInCelsius = true; //TODO: Move to better place
+        private MSIHardwareMonitor HardwareMonitor { get; set; }
         #region Private Fields
 
         /// <summary>
@@ -413,6 +420,26 @@ namespace SubZero
         /// <param name="settings">Settings to show</param>
         private void ProcessSettings(Settings settings)
         {
+            //Let's start sensors first
+            HardwareMonitor = new MSIHardwareMonitor(MSIWmiHelper);
+            //Let's start update Thread
+            Thread updateThread = new Thread(() =>
+            {
+                while (true)
+                {
+                    HardwareMonitor.FanController.RefreshFans();
+                    var rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.CPUFan);
+                    CPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                    rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.GPUFan);
+                    GPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureCelsius()} °C";
+                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureCelsius()} °C";
+                    Thread.Sleep(1000);
+                }
+            })
+            { IsBackground = true, Name = "FanAndTemperatureUpdateThread" };
+            updateThread.Start();
+            //Now check what state we should have, Auto or SubZero?
             enabledSubZero.IsChecked = settings.TurnedOn;
             using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
             {
@@ -429,6 +456,7 @@ namespace SubZero
                 }
                 fanObject.Dispose();
             }
+            //Now load profiles
             profilesList.Items.Clear(); //Clear current settings
             foreach (var profile in settings.Profiles) //Add profiles
             {

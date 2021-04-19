@@ -44,21 +44,40 @@
                 </ListBox>
             </ToolBar>
         </ToolBarTray>
-
-        <materialDesign:Chip Grid.Row="1" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False"
-          Content="CPU Fan Cooling speed"
-          ToolTip="Set how fast should CPU fan run on specific points">
-            <materialDesign:Chip.Icon>
-                <materialDesign:PackIcon Kind="Cpu64Bit" Width="30" Height="30" />
-            </materialDesign:Chip.Icon>
-        </materialDesign:Chip>
-        <materialDesign:Chip Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False"
-          Content="GPU Fan Cooling speed"
-          ToolTip="Set how fast should GPU fan run on specific points">
-            <materialDesign:Chip.Icon>
-                <materialDesign:PackIcon Kind="ExpansionCard" Width="30" Height="30" />
-            </materialDesign:Chip.Icon>
-        </materialDesign:Chip>
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Temperature" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="CPU Fan Cooling speed" ToolTip="Set how fast should CPU fan run on specific points">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Cpu64Bit" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Fan" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal">
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Temperature" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="GPU Fan Cooling speed" ToolTip="Set how fast should GPU fan run on specific points">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="ExpansionCard" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+            <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip.Icon>
+                    <materialDesign:PackIcon Kind="Fan" Width="30" Height="30" />
+                </materialDesign:Chip.Icon>
+            </materialDesign:Chip>
+        </StackPanel>
 
         <GridSplitter Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" VerticalAlignment="Stretch" Width="5px" IsEnabled="False" />
 
