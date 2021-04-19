@@ -12,7 +12,7 @@
         TextElement.FontSize="14"
         FontFamily="{materialDesign:MaterialDesignFont}"
         Loaded="MaterialWindow_Loaded"
-        Title="SubZero - MSI Fan Control" Height="450" MinHeight="450" MinWidth="800" Width="800" WindowStartupLocation="CenterScreen">
+        Title="SubZero - MSI Fan Control" Height="550" MinHeight="550" MinWidth="800" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -22,6 +22,7 @@
             <RowDefinition Height="57px" />
             <RowDefinition Height="50px" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="40px"/>
             <RowDefinition Height="70px" />
         </Grid.RowDefinitions>
         <ToolBarTray Grid.Row="0" Grid.ColumnSpan="2">
@@ -370,7 +371,45 @@
             </GroupBox>
         </Grid>
 
-        <materialDesign:Card Grid.Row="3" Grid.ColumnSpan="2" Margin="10">
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+        </Grid>
+        <Grid Grid.Row="3" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Background="#2e5cff" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                
+            </materialDesign:Card>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Grid.Column="1" Background="#5959a6" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
+            </materialDesign:Card>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Grid.Column="2" Background="#a6a659" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
+            </materialDesign:Card>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Grid.Column="3" Background="#c78f00" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
+            </materialDesign:Card>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Grid.Column="4" Background="#d17500" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
+            </materialDesign:Card>
+            <materialDesign:Card VerticalAlignment="Center" HorizontalAlignment="Center" Width="55" Height="30" Grid.Column="5" Background="Red" materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
+            </materialDesign:Card>
+        </Grid>
+        <materialDesign:Card Grid.Row="4" Grid.ColumnSpan="2" Margin="10">
             <materialDesign:Card.Resources>
                 <ResourceDictionary>
                     <ResourceDictionary.MergedDictionaries>
