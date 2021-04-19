@@ -5,6 +5,16 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>README.md</PackageLicenseFile>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>TODO: GITHUB-URL</RepositoryUrl>
+    <Authors>Richard "TekuSP" Torhan</Authors>
+    <Product>SubZero</Product>
+    <Description>SubZero - MSI Fan Controller</Description>
+    <Copyright>Copyright 2021 Richard "TekuSP" Torhan</Copyright>
+    <PackageIcon>logo-icon.png</PackageIcon>
+    <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
@@ -38,6 +48,17 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>DesignSource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="Resources\logo-icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
