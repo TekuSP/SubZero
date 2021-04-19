@@ -495,7 +495,7 @@ namespace SubZero
                     CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureFahrenheit()} °F";
                     GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureFahrenheit()} °F";
                 }
-                Thread.Sleep(1000);
+                Thread.Sleep(ApplicationSettings.PollingSpeed);
             }
         }
 

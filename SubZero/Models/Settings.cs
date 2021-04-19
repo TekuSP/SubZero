@@ -49,7 +49,7 @@ namespace SubZero.Models
         public Settings()
         {
             Profiles = new Profile[0];
-            PollingSpeed = 1000;
+            PollingSpeed = 2000;
             TurnedOn = false;
             UseCelsius = true;
         }
