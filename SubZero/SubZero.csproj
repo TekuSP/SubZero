@@ -8,7 +8,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseFile>README.md</PackageLicenseFile>
     <RepositoryType>Git</RepositoryType>
-    <RepositoryUrl>TODO: GITHUB-URL</RepositoryUrl>
+    <RepositoryUrl>https://github.com/TekuSP/SubZero</RepositoryUrl>
     <Authors>Richard "TekuSP" Torhan</Authors>
     <Product>SubZero</Product>
     <Description>SubZero - MSI Fan Controller</Description>
@@ -16,6 +16,10 @@
     <PackageIcon>logo-icon.png</PackageIcon>
     <NeutralLanguage>en</NeutralLanguage>
     <ApplicationIcon>Resources\logo-icon.ico</ApplicationIcon>
+    <PackageProjectUrl>https://github.com/TekuSP/SubZero</PackageProjectUrl>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

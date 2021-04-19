@@ -6,13 +6,13 @@
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                     xmlns:mde="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
                     mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
-        Background="{DynamicResource MaterialDesignPaper}"
-        TextElement.FontWeight="Medium"
-        TextElement.FontSize="14"
-        FontFamily="{materialDesign:MaterialDesignFont}"
-        Loaded="MaterialWindow_Loaded"
-        Title="SubZero - MSI Fan Control" Height="550" MinHeight="550" MinWidth="800" Width="800" WindowStartupLocation="CenterScreen">
+                    TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                    Background="{DynamicResource MaterialDesignPaper}"
+                    TextElement.FontWeight="Medium"
+                    TextElement.FontSize="14"
+                    FontFamily="{materialDesign:MaterialDesignFont}"
+                    Loaded="MaterialWindow_Loaded"
+                    Title="SubZero - MSI Fan Control" Height="550" MinHeight="550" MinWidth="800" Width="800" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
