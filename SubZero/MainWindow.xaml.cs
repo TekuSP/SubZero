@@ -57,9 +57,9 @@ namespace SubZero
         #endregion Public Constructors
 
         #region Public Events
-
+#pragma warning disable 67
         public event PropertyChangedEventHandler PropertyChanged;
-
+#pragma warning restore 67
         #endregion Public Events
 
         #region Public Properties
