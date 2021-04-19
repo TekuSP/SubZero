@@ -19,6 +19,7 @@ namespace SubZero.Models
         /// Fan Controller
         /// </summary>
         private Hardware.MSIFans FanController { get; }
+        private Hardware.MSITemperatureSensors TemperatureSensors { get; }
         /// <summary>
         /// Initializes MSI Hardware monitoring
         /// </summary>
@@ -26,7 +27,9 @@ namespace SubZero.Models
         public MSIHardwareMonitor(MSIWmiHelper wmiHelper)
         {
             MSIWmiHelper = wmiHelper;
-            FanController = new Hardware.MSIFans();
+            FanController = new Hardware.MSIFans(wmiHelper);
+            FanController.StartMonitor(TimeSpan.FromMilliseconds(500));
+            TemperatureSensors = new Hardware.MSITemperatureSensors(wmiHelper);
         }
 
 

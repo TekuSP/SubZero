@@ -51,6 +51,16 @@ namespace SubZero.Models
         /// </summary>
         public int Version { get; set; }
 
+        /// <summary>
+        /// Polling speed of fans RPM in milliseconds
+        /// </summary>
+        public int FanPollingSpeed { get; set; }
+
+        /// <summary>
+        /// Polling speed of temperatures in milliseconds
+        /// </summary>
+        public int TemperaturePollingSpeed { get; set; }
+
         #endregion Public Properties
     }
 

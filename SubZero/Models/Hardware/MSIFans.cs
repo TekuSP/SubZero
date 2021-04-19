@@ -31,8 +31,22 @@ namespace SubZero.Models.Hardware
 
         #endregion Private Fields
 
+        #region Public Constructors
+
+        /// <summary>
+        /// Initializes MSI Fans controller with WMI Helper
+        /// </summary>
+        /// <param name="helper">WMI Helper to use</param>
+        public MSIFans(MSIWmiHelper helper)
+        {
+            Helper = helper;
+        }
+
+        #endregion Public Constructors
+
         #region Private Properties
 
+        private MSIWmiHelper Helper { get; }
         private bool MonitorRunning { get; set; }
 
         #endregion Private Properties
@@ -58,12 +72,12 @@ namespace SubZero.Models.Hardware
         /// Reloads all Fans and their RPMs from motherboard
         /// </summary>
         /// <param name="helper">WMI Helper to use</param>
-        public void RefreshFans(MSIWmiHelper helper)
+        public void RefreshFans()
         {
             lock (this)
             {
                 rpms.Clear(); //Clear dict
-                using (System.Management.ManagementObjectCollection ap = helper.MSI_AP.Get())
+                using (System.Management.ManagementObjectCollection ap = Helper.MSI_AP.Get())
                 {
                     bool even = false;
                     int fanNumber = 0;
@@ -91,7 +105,7 @@ namespace SubZero.Models.Hardware
         /// <param name="helper">WMI Helper to use</param>
         /// <param name="interval">How fast to poll</param>
         /// <returns>Returns false if Monitor is Running already, true if started succesfully</returns>
-        public bool StartMonitor(MSIWmiHelper helper, TimeSpan interval)
+        public bool StartMonitor(TimeSpan interval)
         {
             if (MonitorRunning) //False if is it running already
                 return false;
@@ -99,7 +113,7 @@ namespace SubZero.Models.Hardware
             {
                 while (MonitorRunning)
                 {
-                    RefreshFans(helper); //Refresh
+                    RefreshFans(); //Refresh
                     Thread.Sleep(interval); //Wait
                 }
             })
