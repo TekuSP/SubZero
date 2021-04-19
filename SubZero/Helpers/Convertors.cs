@@ -34,6 +34,10 @@ namespace SubZero.Helpers
             return image;
         }
 
+        public static double ToFahrenheit(this double celsius) => ((double)celsius / 5.0 * 9.0 + 32.0);
+        public static double ToFahrenheit(this int celsius) => ((double)celsius / 5.0 * 9.0 + 32.0);
+
+
         #endregion Public Methods
     }
 }

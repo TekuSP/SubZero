@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 
 using SubZero.Models;
 using SubZero.Resources;
+using SubZero.Helpers;
 
 using System;
 using System.Collections.Generic;
@@ -522,6 +523,40 @@ namespace SubZero
             gpu4.Value = profileInfo.GPU.Value4.FanSpeed / 100d;
             gpu5.Value = profileInfo.GPU.Value5.FanSpeed / 100d;
             gpu6.Value = profileInfo.GPU.Value6.FanSpeed / 100d;
+
+            if (ApplicationSettings.UseCelsius)
+            {
+                cpuTemp1.Text = $"{profileInfo.CPU.Value1.Temperature} °C";
+                cpuTemp2.Text = $"{profileInfo.CPU.Value2.Temperature} °C";
+                cpuTemp3.Text = $"{profileInfo.CPU.Value3.Temperature} °C";
+                cpuTemp4.Text = $"{profileInfo.CPU.Value4.Temperature} °C";
+                cpuTemp5.Text = $"{profileInfo.CPU.Value5.Temperature} °C";
+                cpuTemp6.Text = $"{profileInfo.CPU.Value6.Temperature} °C";
+
+                gpuTemp1.Text = $"{profileInfo.GPU.Value1.Temperature} °C";
+                gpuTemp2.Text = $"{profileInfo.GPU.Value2.Temperature} °C";
+                gpuTemp3.Text = $"{profileInfo.GPU.Value3.Temperature} °C";
+                gpuTemp4.Text = $"{profileInfo.GPU.Value4.Temperature} °C";
+                gpuTemp5.Text = $"{profileInfo.GPU.Value5.Temperature} °C";
+                gpuTemp6.Text = $"{profileInfo.GPU.Value6.Temperature} °C";
+            }
+            else
+            {
+                cpuTemp1.Text = $"{profileInfo.CPU.Value1.Temperature.ToFahrenheit()} °F";
+                cpuTemp2.Text = $"{profileInfo.CPU.Value2.Temperature.ToFahrenheit()} °F";
+                cpuTemp3.Text = $"{profileInfo.CPU.Value3.Temperature.ToFahrenheit()} °F";
+                cpuTemp4.Text = $"{profileInfo.CPU.Value4.Temperature.ToFahrenheit()} °F";
+                cpuTemp5.Text = $"{profileInfo.CPU.Value5.Temperature.ToFahrenheit()} °F";
+                cpuTemp6.Text = $"{profileInfo.CPU.Value6.Temperature.ToFahrenheit()} °F";
+
+                gpuTemp1.Text = $"{profileInfo.GPU.Value1.Temperature.ToFahrenheit()} °F";
+                gpuTemp2.Text = $"{profileInfo.GPU.Value2.Temperature.ToFahrenheit()} °F";
+                gpuTemp3.Text = $"{profileInfo.GPU.Value3.Temperature.ToFahrenheit()} °F";
+                gpuTemp4.Text = $"{profileInfo.GPU.Value4.Temperature.ToFahrenheit()} °F";
+                gpuTemp5.Text = $"{profileInfo.GPU.Value5.Temperature.ToFahrenheit()} °F";
+                gpuTemp6.Text = $"{profileInfo.GPU.Value6.Temperature.ToFahrenheit()} °F";
+            }
+
 
             IsEdited = false;
             IsSaved = false;
