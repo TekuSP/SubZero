@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace SubZero.Convertors
+namespace SubZero.Helpers
 {
     public static class ImageTools
     {

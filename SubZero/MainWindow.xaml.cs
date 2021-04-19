@@ -3,7 +3,7 @@ using MaterialDesignExtensions.Controls;
 using Newtonsoft.Json;
 
 using SubZero.Resources;
-
+using SubZero.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,15 +31,7 @@ namespace SubZero
         /// </summary>
         private const int configFileVersion = 1;
 
-        /// <summary>
-        /// CPU WMI
-        /// </summary>
-        private ManagementObjectSearcher MSI_CPU;
-
-        /// <summary>
-        /// GPU WMI
-        /// </summary>
-        private ManagementObjectSearcher MSI_GPU;
+        private MSIWmiHelper MSIWmiHelper { get; set; }
 
         #endregion Private Fields
 
@@ -49,7 +41,7 @@ namespace SubZero
         {
             InitializeComponent();
             //Init icons
-            var imgSource = Convertors.ImageTools.ImageSourceFromBitmap(DesignSource.logo_icon);
+            var imgSource = Helpers.ImageTools.ImageSourceFromBitmap(DesignSource.logo_icon);
             this.Icon = imgSource;
             this.TitleBarIcon = imgSource;
         }
@@ -115,8 +107,8 @@ namespace SubZero
             ((profilesList.SelectedItem as ListBoxItem)).Tag = appliedProfile; //Synchronize changes first
 
             int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
-            using (var cpuData = MSI_CPU.Get())
-            using (var gpudata = MSI_GPU.Get())
+            using (var cpuData = MSIWmiHelper.MSI_CPU.Get())
+            using (var gpudata = MSIWmiHelper.MSI_GPU.Get())
             {
                 foreach (ManagementObject cpuValue in cpuData)
                 {
@@ -234,8 +226,8 @@ namespace SubZero
             TemperatureSettings gpuTemps = new TemperatureSettings();
             int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
             //Prepare WMI
-            using (var cpuData = MSI_CPU.Get())
-            using (var gpudata = MSI_GPU.Get())
+            using (var cpuData = MSIWmiHelper.MSI_CPU.Get())
+            using (var gpudata = MSIWmiHelper.MSI_GPU.Get())
             {
                 foreach (ManagementObject cpuValue in cpuData)
                 {
@@ -310,20 +302,16 @@ namespace SubZero
         private void MaterialWindow_Loaded(object sender, RoutedEventArgs e)
         {
             //Window is Loaded, start initialization, load Managment Objects
-            MSI_CPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_CPU");
-            MSI_GPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_VGA");
-            var MSI_MTHB = new ManagementObjectSearcher("root\\CIMV2", "SELECT Model FROM Win32_ComputerSystem");
+            MSIWmiHelper = new MSIWmiHelper();
             //Disposable, test components if we are on MSI laptop
-            using (var mthbInfo = MSI_MTHB.Get())
-            using (var cpuTest = MSI_CPU.Get())
-            using (var gpuTest = MSI_GPU.Get())
+            using (var mthbInfo = MSIWmiHelper.MSI_LaptopModel.Get())
             {
-                if (cpuTest.Count == 0 || gpuTest.Count == 0)
+                if (!MSIWmiHelper.IsAvailableMSI_CPU || !MSIWmiHelper.IsAvailableMSI_GPU)
                 {
                     //Not detected MSI laptop, show dialog to user
                     return;
                 }
-                if (mthbInfo.Count == 0)
+                if (!MSIWmiHelper.IsAvailableMSI_LaptopModel)
                 {
                     //Huh, is this MSI Laptop? Inform user, but continue execution
                     LaptopModel = "Unknown";

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SubZero
+namespace SubZero.Models
 {
     /// <summary>
     /// Profile information
