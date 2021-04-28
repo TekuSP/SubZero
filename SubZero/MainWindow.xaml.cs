@@ -100,17 +100,8 @@ namespace SubZero
 
         #region Private Methods
 
-        /// <summary>
-        /// Apply settings to laptop
-        /// </summary>
-        private async void applyButton_Click(object sender, RoutedEventArgs e)
+        private void ApplyToSettings()
         {
-            if (!ApplicationSettings.TurnedOn) //Are we running so we can apply?
-            {
-                var dialog = OKDialog.ShowErrorDialog("Cannot apply! Application is disabled!", () => { DialogHost.Close("mainDialog"); });
-                _ = await DialogHost.Show(dialog, "mainDialog");
-                return;
-            }
             ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
             ApplicationSettings.CurrentProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
             ApplicationSettings.CurrentProfile.CPU.Value3.FanSpeed = (int)Math.Round(cpu3.Value * 100);
@@ -124,7 +115,20 @@ namespace SubZero
             ApplicationSettings.CurrentProfile.GPU.Value4.FanSpeed = (int)Math.Round(gpu4.Value * 100);
             ApplicationSettings.CurrentProfile.GPU.Value5.FanSpeed = (int)Math.Round(gpu5.Value * 100);
             ApplicationSettings.CurrentProfile.GPU.Value6.FanSpeed = (int)Math.Round(gpu6.Value * 100);
+        }
 
+        /// <summary>
+        /// Apply settings to laptop
+        /// </summary>
+        private async void applyButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ApplicationSettings.TurnedOn) //Are we running so we can apply?
+            {
+                var dialog = OKDialog.ShowErrorDialog("Cannot apply! Application is disabled!", () => { DialogHost.Close("mainDialog"); });
+                _ = await DialogHost.Show(dialog, "mainDialog");
+                return;
+            }
+            ApplyToSettings();
             int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
             using (var cpuData = MSIWmiHelper.MSI_CPU.Get())
             using (var gpudata = MSIWmiHelper.MSI_GPU.Get())
@@ -461,18 +465,31 @@ namespace SubZero
             enabledSubZero.IsChecked = settings.TurnedOn;
             using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
             {
-                var fanObject = system.Cast<ManagementObject>().ElementAt(9);
-                if (settings.TurnedOn)
+                var fanObject = system.Cast<ManagementObject>().ElementAt(9); //191 on, 63 off
+                var advancedObject = system.Cast<ManagementObject>().ElementAt(7); //196 on, 193 balanced
+                var silentObject = system.Cast<ManagementObject>().ElementAt(10); //Silent 5, nonSilent 3
+
+                if (enabledSubZero.IsChecked.GetValueOrDefault())
                 {
-                    fanObject.SetPropertyValue("System", ((Convert.ToInt32(fanObject["System"]) | 128) & 191));
+                    fanObject.SetPropertyValue("System", 175);
                     fanObject.Put();
+                    advancedObject.SetPropertyValue("System", 196);
+                    advancedObject.Put();
+                    silentObject.SetPropertyValue("System", 0);
+                    silentObject.Put();
                 }
                 else
                 {
-                    fanObject.SetPropertyValue("System", (Convert.ToInt32(fanObject["System"]) & 63));
+                    fanObject.SetPropertyValue("System", 47);
                     fanObject.Put();
+                    advancedObject.SetPropertyValue("System", 193);
+                    advancedObject.Put();
+                    silentObject.SetPropertyValue("System", 5);
+                    silentObject.Put();
                 }
                 fanObject.Dispose();
+                advancedObject.Dispose();
+                silentObject.Dispose();
             }
             RefreshSettings();
         }
@@ -493,18 +510,22 @@ namespace SubZero
             {
                 HardwareMonitor.FanController.RefreshFans();
                 var rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.CPUFan);
-                CPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                CPURPM = rpm == -1 || rpm == 0 ? "N/A" : $"{rpm}";
                 rpm = HardwareMonitor.FanController.GetFanSpeed(Models.Hardware.MSIFanType.GPUFan);
-                GPURPM = rpm == -1 ? "N/A" : $"{rpm}";
+                GPURPM = rpm == -1 || rpm == 0 ? "N/A" : $"{rpm}";
                 if (ApplicationSettings.UseCelsius)
                 {
-                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureCelsius()} °C";
-                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureCelsius()} °C";
+                    var cpu = HardwareMonitor.TemperatureSensors.GetCPUTemperatureCelsius();
+                    var gpu = HardwareMonitor.TemperatureSensors.GetGPUTemperatureCelsius();
+                    CPUTemperature = $"{(cpu == 0 ? "N/A" : cpu)} °C";
+                    GPUTemperature = $"{(gpu == 0 ? "N/A" : gpu)} °C";
                 }
                 else
                 {
-                    CPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetCPUTemperatureFahrenheit()} °F";
-                    GPUTemperature = $"{HardwareMonitor.TemperatureSensors.GetGPUTemperatureFahrenheit()} °F";
+                    var cpu = HardwareMonitor.TemperatureSensors.GetCPUTemperatureFahrenheit();
+                    var gpu = HardwareMonitor.TemperatureSensors.GetCPUTemperatureFahrenheit();
+                    CPUTemperature = $"{(cpu == 0 ? "N/A" : cpu)} °F";
+                    GPUTemperature = $"{(gpu == 0 ? "N/A" : gpu)} °F";
                 }
                 Thread.Sleep(ApplicationSettings.PollingSpeed);
             }
@@ -543,7 +564,7 @@ namespace SubZero
                     }
                 }
             }
-            if (e.AddedItems.Count == 0)
+            if (e != null && e.RemovedItems.Count > 0 && profilesList.SelectedIndex == -1)
                 return;
             ApplicationSettings.SelectedProfileIndex = profilesList.SelectedIndex; //Change index!
             cpu1.Value = ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed / 100d;
@@ -615,8 +636,8 @@ namespace SubZero
                 _ = DialogHost.Show(new LoadingDialog("Saving..."), "mainDialog");
                 ourDialog = true;
             }
-            if (IsEdited && ApplicationSettings.TurnedOn)
-                applyButton_Click(this, new RoutedEventArgs()); //Apply settings first
+            if (IsEdited)
+                ApplyToSettings(); //Apply settings first
             try
             {
                 File.WriteAllText(configFileName, JsonConvert.SerializeObject(ApplicationSettings, Formatting.Indented)); //Try to save
@@ -667,21 +688,36 @@ namespace SubZero
             {
                 _ = DialogHost.Show(new LoadingDialog("Disabling..."), "mainDialog");
             }
+            ApplicationSettings.TurnedOn = enabledSubZero.IsChecked.GetValueOrDefault();
+            ApplyToSettings();
             await SaveData();
             using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
             {
-                var fanObject = system.Cast<ManagementObject>().ElementAt(9);
+                var fanObject = system.Cast<ManagementObject>().ElementAt(9); //191 on, 63 off
+                var advancedObject = system.Cast<ManagementObject>().ElementAt(7); //196 on, 193 balanced
+                var silentObject = system.Cast<ManagementObject>().ElementAt(10); //Silent 5, nonSilent 3
+
                 if (enabledSubZero.IsChecked.GetValueOrDefault())
                 {
-                    fanObject.SetPropertyValue("System", ((Convert.ToInt32(fanObject["System"]) | 128) & 191));
+                    fanObject.SetPropertyValue("System", 175);
                     fanObject.Put();
+                    advancedObject.SetPropertyValue("System", 196);
+                    advancedObject.Put();
+                    silentObject.SetPropertyValue("System", 0);
+                    silentObject.Put();
                 }
                 else
                 {
-                    fanObject.SetPropertyValue("System", (Convert.ToInt32(fanObject["System"]) & 63));
+                    fanObject.SetPropertyValue("System", 47);
                     fanObject.Put();
+                    advancedObject.SetPropertyValue("System", 193);
+                    advancedObject.Put();
+                    silentObject.SetPropertyValue("System", 5);
+                    silentObject.Put();
                 }
                 fanObject.Dispose();
+                advancedObject.Dispose();
+                silentObject.Dispose();
             }
             await Task.Run(() =>
             {
@@ -695,7 +731,7 @@ namespace SubZero
 
         private async void settings_Click(object sender, RoutedEventArgs e)
         {
-            _ = await DialogHost.Show(YesNoDialog.ShowErrorDialog("Fucked up", null), "mainDialog");
+            _ = await DialogHost.Show(OKDialog.ShowSettingsTemporaryDialog("Here would be settings dialog if I had more time.\n\nAuthor: Richard \"TekuSP\" Torhan\nLicense: Apache License 2.0\nCopyright 2021 Richard \"TekuSP\" Torhan\nVersion: 0.1-Alpha", () => { DialogHost.Close("mainDialog"); }), "mainDialog");
         }
 
         private async void newProfile_Click(object sender, RoutedEventArgs e)
@@ -708,6 +744,8 @@ namespace SubZero
             temp.Add(new Profile(ApplicationSettings.CurrentProfile) { Name = dialog.DialogResult });
             ApplicationSettings.Profiles = temp.ToArray();
             RefreshSettings();
+            ApplicationSettings.SelectedProfileIndex = temp.Count - 1;
+            await SaveData();
         }
 
         private async void removeProfile_Click(object sender, RoutedEventArgs e)
@@ -730,12 +768,14 @@ namespace SubZero
             _ = await DialogHost.Show(dialog2, "mainDialog");
             if (!dialog2.DialogResult)
                 return; //User said no
-            profilesList.SelectedIndex = profilesList.SelectedIndex - 1;
+            if (profilesList.SelectedIndex != 0)
+                profilesList.SelectedIndex = profilesList.SelectedIndex - 1;
             ApplicationSettings.SelectedProfileIndex = profilesList.SelectedIndex;
             var temp = ApplicationSettings.Profiles.ToList();
             temp.RemoveAt(profilesList.SelectedIndex + 1);
             ApplicationSettings.Profiles = temp.ToArray();
             RefreshSettings();
+            await SaveData();
         }
         private async void RefreshSettings()
         {
@@ -748,9 +788,11 @@ namespace SubZero
                 blockToAdd.FontSize = 14;
                 //End of same settings
                 blockToAdd.Text = profile.Name;
+                duplicateCall = true;
                 profilesList.Items.Add(itemToAdd); //Add tab
             }
             profilesList.SelectedIndex = ApplicationSettings.SelectedProfileIndex;
+            profilesList_SelectionChanged(this, null);
             if (ApplicationSettings.Profiles.Length == 1) //Is this only profile?
                 DeleteAllowed = false;
             else

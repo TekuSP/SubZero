@@ -14,12 +14,14 @@ namespace SubZero.Models
         {
             CPU = new TemperatureSettings();
             GPU = new TemperatureSettings();
+            Guid = Guid.NewGuid();
         }
         public Profile(Profile profileBasedOn)
         {
             Name = profileBasedOn.Name.Clone().ToString();
             CPU = new TemperatureSettings(profileBasedOn.CPU);
             GPU = new TemperatureSettings(profileBasedOn.GPU);
+            Guid = Guid.NewGuid();
         }
         #endregion Public Constructors
 
@@ -40,6 +42,10 @@ namespace SubZero.Models
         /// </summary>
         public TemperatureSettings GPU { get; set; }
 
+        /// <summary>
+        /// Unique profile GUID
+        /// </summary>
+        public Guid Guid { get; set; }
         #endregion Public Properties
     }
 
