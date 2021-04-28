@@ -792,6 +792,7 @@ namespace SubZero
                 profilesList.Items.Add(itemToAdd); //Add tab
             }
             profilesList.SelectedIndex = ApplicationSettings.SelectedProfileIndex;
+            duplicateCall = false;
             profilesList_SelectionChanged(this, null);
             if (ApplicationSettings.Profiles.Length == 1) //Is this only profile?
                 DeleteAllowed = false;
