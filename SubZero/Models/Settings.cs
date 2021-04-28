@@ -15,7 +15,12 @@ namespace SubZero.Models
             CPU = new TemperatureSettings();
             GPU = new TemperatureSettings();
         }
-
+        public Profile(Profile profileBasedOn)
+        {
+            Name = profileBasedOn.Name.Clone().ToString();
+            CPU = new TemperatureSettings(profileBasedOn.CPU);
+            GPU = new TemperatureSettings(profileBasedOn.GPU);
+        }
         #endregion Public Constructors
 
         #region Public Properties
@@ -120,7 +125,15 @@ namespace SubZero.Models
             Value5 = new TempFan();
             Value6 = new TempFan();
         }
-
+        public TemperatureSettings(TemperatureSettings basedOn)
+        {
+            Value1 = new TempFan(basedOn.Value1);
+            Value2 = new TempFan(basedOn.Value2);
+            Value3 = new TempFan(basedOn.Value3);
+            Value4 = new TempFan(basedOn.Value4);
+            Value5 = new TempFan(basedOn.Value5);
+            Value6 = new TempFan(basedOn.Value6);
+        }
         #endregion Public Constructors
 
         #region Public Properties
@@ -199,6 +212,11 @@ namespace SubZero.Models
         {
             Temperature = temperature;
             FanSpeed = fanSpeed;
+        }
+        public TempFan(TempFan basedOn)
+        {
+            Temperature = basedOn.Temperature;
+            FanSpeed = basedOn.FanSpeed;
         }
         /// <summary>
         /// Constructs empty TempFan (Serialization)

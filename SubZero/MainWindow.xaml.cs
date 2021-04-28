@@ -103,8 +103,14 @@ namespace SubZero
         /// <summary>
         /// Apply settings to laptop
         /// </summary>
-        private void applyButton_Click(object sender, RoutedEventArgs e)
+        private async void applyButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ApplicationSettings.TurnedOn) //Are we running so we can apply?
+            {
+                var dialog = OKDialog.ShowErrorDialog("Cannot apply! Application is disabled!", () => { DialogHost.Close("mainDialog"); });
+                _ = await DialogHost.Show(dialog, "mainDialog");
+                return;
+            }
             ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
             ApplicationSettings.CurrentProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
             ApplicationSettings.CurrentProfile.CPU.Value3.FanSpeed = (int)Math.Round(cpu3.Value * 100);
@@ -468,24 +474,7 @@ namespace SubZero
                 }
                 fanObject.Dispose();
             }
-            //Now load profiles
-            profilesList.Items.Clear(); //Clear current settings
-            foreach (var profile in settings.Profiles) //Add profiles
-            {
-                ListBoxItem itemToAdd = new ListBoxItem();
-                TextBlock blockToAdd = new TextBlock();
-                itemToAdd.Content = blockToAdd;
-                blockToAdd.FontSize = 14;
-                //End of same settings
-                blockToAdd.Text = profile.Name;
-                itemToAdd.Tag = profile; //Save current profile in a tag
-
-                profilesList.Items.Add(itemToAdd); //Add tab
-            }
-            if (settings.Profiles.Length == 1) //Is this only profile?
-                DeleteAllowed = false;
-            else
-                DeleteAllowed = true;
+            RefreshSettings();
         }
 
         /// <summary>
@@ -626,7 +615,7 @@ namespace SubZero
                 _ = DialogHost.Show(new LoadingDialog("Saving..."), "mainDialog");
                 ourDialog = true;
             }
-            if (IsEdited)
+            if (IsEdited && ApplicationSettings.TurnedOn)
                 applyButton_Click(this, new RoutedEventArgs()); //Apply settings first
             try
             {
@@ -707,6 +696,65 @@ namespace SubZero
         private async void settings_Click(object sender, RoutedEventArgs e)
         {
             _ = await DialogHost.Show(YesNoDialog.ShowErrorDialog("Fucked up", null), "mainDialog");
+        }
+
+        private async void newProfile_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = TextBoxDialog.ShowInformationDialog("Name your profile", () => { DialogHost.Close("mainDialog"); });
+            _ = await DialogHost.Show(dialog, "mainDialog");
+            if (dialog.DialogResult == null)
+                return; //Abort user pressed cancel or wrote nothing
+            var temp = ApplicationSettings.Profiles.ToList();
+            temp.Add(new Profile(ApplicationSettings.CurrentProfile) { Name = dialog.DialogResult });
+            ApplicationSettings.Profiles = temp.ToArray();
+            RefreshSettings();
+        }
+
+        private async void removeProfile_Click(object sender, RoutedEventArgs e)
+        {
+            if (ApplicationSettings.Profiles.Length < 2)
+            {
+                //We have to have at least 1 profile
+                var dialog = OKDialog.ShowErrorDialog("Can't remove!\nYou have to have at least 1 profile!", () => { DialogHost.Close("mainDialog"); });
+                _ = await DialogHost.Show(dialog, "mainDialog");
+                return;
+            }
+            if (ApplicationSettings.SelectedProfileIndex == profilesList.SelectedIndex && ApplicationSettings.TurnedOn)
+            {
+                //We can't remove ourselves when running!
+                var dialog = OKDialog.ShowErrorDialog("Can't remove!\nSelected profile is currently active!", () => { DialogHost.Close("mainDialog"); });
+                _ = await DialogHost.Show(dialog, "mainDialog");
+                return;
+            }
+            var dialog2 = YesNoDialog.ShowInformationDialog($"Profile {ApplicationSettings.CurrentProfile.Name} will be removed,\ndo you want to continue?", () => { DialogHost.Close("mainDialog"); });
+            _ = await DialogHost.Show(dialog2, "mainDialog");
+            if (!dialog2.DialogResult)
+                return; //User said no
+            profilesList.SelectedIndex = profilesList.SelectedIndex - 1;
+            ApplicationSettings.SelectedProfileIndex = profilesList.SelectedIndex;
+            var temp = ApplicationSettings.Profiles.ToList();
+            temp.RemoveAt(profilesList.SelectedIndex + 1);
+            ApplicationSettings.Profiles = temp.ToArray();
+            RefreshSettings();
+        }
+        private async void RefreshSettings()
+        {
+            profilesList.Items.Clear(); //Clear current settings
+            foreach (var profile in ApplicationSettings.Profiles) //Add profiles
+            {
+                ListBoxItem itemToAdd = new ListBoxItem();
+                TextBlock blockToAdd = new TextBlock();
+                itemToAdd.Content = blockToAdd;
+                blockToAdd.FontSize = 14;
+                //End of same settings
+                blockToAdd.Text = profile.Name;
+                profilesList.Items.Add(itemToAdd); //Add tab
+            }
+            profilesList.SelectedIndex = ApplicationSettings.SelectedProfileIndex;
+            if (ApplicationSettings.Profiles.Length == 1) //Is this only profile?
+                DeleteAllowed = false;
+            else
+                DeleteAllowed = true;
         }
     }
 }

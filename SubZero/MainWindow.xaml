@@ -38,8 +38,8 @@
                         </materialDesign:ToggleButtonAssist.SwitchTrackOffBackground>
                     </ToggleButton>
                     <Button ToolTip="Open settings" x:Name="settings" Content="{materialDesign:PackIcon Kind=Settings}" Click="settings_Click" />
-                    <Button ToolTip="Add new profile" x:Name="newProfile" Content="{materialDesign:PackIcon Kind=PlusBox}" />
-                    <Button ToolTip="Remove selected profile" IsEnabled="{Binding DeleteAllowed, UpdateSourceTrigger=PropertyChanged}" x:Name="removeProfile" Content="{materialDesign:PackIcon Kind=MinusBox}" />
+                    <Button ToolTip="Add new profile" x:Name="newProfile" Content="{materialDesign:PackIcon Kind=PlusBox}" Click="newProfile_Click"/>
+                    <Button ToolTip="Remove selected profile" IsEnabled="{Binding DeleteAllowed, UpdateSourceTrigger=PropertyChanged}" x:Name="removeProfile" Content="{materialDesign:PackIcon Kind=MinusBox}" Click="removeProfile_Click" />
                     <Separator />
                     <ListBox SelectedIndex="0" x:Name="profilesList" SelectionChanged="profilesList_SelectionChanged">
                     </ListBox>
