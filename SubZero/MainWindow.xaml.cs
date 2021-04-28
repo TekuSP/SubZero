@@ -32,7 +32,6 @@ namespace SubZero
         public string GPURPM { get; set; }
         private MSIHardwareMonitor HardwareMonitor { get; set; }
         public Settings ApplicationSettings { get; set; }
-        public Profile ActiveProfile { get; set; }
 
         #region Private Fields
 
@@ -47,6 +46,8 @@ namespace SubZero
         private const int configFileVersion = 1;
 
         private MSIWmiHelper MSIWmiHelper { get; set; }
+
+        private bool duplicateCall = false;
 
         #endregion Private Fields
 
@@ -104,22 +105,19 @@ namespace SubZero
         /// </summary>
         private void applyButton_Click(object sender, RoutedEventArgs e)
         {
-            Profile appliedProfile = ((profilesList.SelectedItem as ListBoxItem).Tag as Profile);
-            appliedProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
-            appliedProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
-            appliedProfile.CPU.Value3.FanSpeed = (int)Math.Round(cpu3.Value * 100);
-            appliedProfile.CPU.Value4.FanSpeed = (int)Math.Round(cpu4.Value * 100);
-            appliedProfile.CPU.Value5.FanSpeed = (int)Math.Round(cpu5.Value * 100);
-            appliedProfile.CPU.Value6.FanSpeed = (int)Math.Round(cpu6.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed = (int)Math.Round(cpu1.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value2.FanSpeed = (int)Math.Round(cpu2.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value3.FanSpeed = (int)Math.Round(cpu3.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value4.FanSpeed = (int)Math.Round(cpu4.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value5.FanSpeed = (int)Math.Round(cpu5.Value * 100);
+            ApplicationSettings.CurrentProfile.CPU.Value6.FanSpeed = (int)Math.Round(cpu6.Value * 100);
 
-            appliedProfile.GPU.Value1.FanSpeed = (int)Math.Round(gpu1.Value * 100);
-            appliedProfile.GPU.Value2.FanSpeed = (int)Math.Round(gpu2.Value * 100);
-            appliedProfile.GPU.Value3.FanSpeed = (int)Math.Round(gpu3.Value * 100);
-            appliedProfile.GPU.Value4.FanSpeed = (int)Math.Round(gpu4.Value * 100);
-            appliedProfile.GPU.Value5.FanSpeed = (int)Math.Round(gpu5.Value * 100);
-            appliedProfile.GPU.Value6.FanSpeed = (int)Math.Round(gpu6.Value * 100);
-
-            ((profilesList.SelectedItem as ListBoxItem)).Tag = appliedProfile; //Synchronize changes first
+            ApplicationSettings.CurrentProfile.GPU.Value1.FanSpeed = (int)Math.Round(gpu1.Value * 100);
+            ApplicationSettings.CurrentProfile.GPU.Value2.FanSpeed = (int)Math.Round(gpu2.Value * 100);
+            ApplicationSettings.CurrentProfile.GPU.Value3.FanSpeed = (int)Math.Round(gpu3.Value * 100);
+            ApplicationSettings.CurrentProfile.GPU.Value4.FanSpeed = (int)Math.Round(gpu4.Value * 100);
+            ApplicationSettings.CurrentProfile.GPU.Value5.FanSpeed = (int)Math.Round(gpu5.Value * 100);
+            ApplicationSettings.CurrentProfile.GPU.Value6.FanSpeed = (int)Math.Round(gpu6.Value * 100);
 
             int counter = 0; //Because Microsoft does not allow indexing of ManagmentObjectCollection
             using (var cpuData = MSIWmiHelper.MSI_CPU.Get())
@@ -132,32 +130,32 @@ namespace SubZero
                     switch (counter)
                     {
                         case 11:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value1.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 12:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value2.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value2.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 13:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value3.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value3.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 14:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value4.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value4.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 15:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value5.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value5.FanSpeed);
                             cpuValue.Put();
                             break;
 
                         case 16:
-                            cpuValue.SetPropertyValue("CPU", appliedProfile.CPU.Value6.FanSpeed);
+                            cpuValue.SetPropertyValue("CPU", ApplicationSettings.CurrentProfile.CPU.Value6.FanSpeed);
                             cpuValue.Put();
                             break;
                     }
@@ -170,32 +168,32 @@ namespace SubZero
                     switch (counter)
                     {
                         case 11:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value1.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value1.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 12:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value2.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value2.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 13:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value3.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value3.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 14:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value4.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value4.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 15:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value5.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value5.FanSpeed);
                             gpuValue.Put();
                             break;
 
                         case 16:
-                            gpuValue.SetPropertyValue("VGA", appliedProfile.GPU.Value6.FanSpeed);
+                            gpuValue.SetPropertyValue("VGA", ApplicationSettings.CurrentProfile.GPU.Value6.FanSpeed);
                             gpuValue.Put();
                             break;
                     }
@@ -229,12 +227,11 @@ namespace SubZero
             _ = await DialogHost.Show(dialog, "mainDialog");
             if (!dialog.DialogResult)
                 return; //User said no
-            var current = (profilesList.SelectedItem as ListBoxItem);
-            (current.Tag as Profile).CPU = TemperatureSettings.FactoryCPU;
-            (current.Tag as Profile).GPU = TemperatureSettings.FactoryGPU;
+            ApplicationSettings.CurrentProfile.CPU = TemperatureSettings.FactoryCPU;
+            ApplicationSettings.CurrentProfile.GPU = TemperatureSettings.FactoryGPU;
             profilesList_SelectionChanged(sender, new SelectionChangedEventArgs(e.RoutedEvent, new List<object>(), new List<object>
             {
-                 current//Load factory item
+                 ApplicationSettings.CurrentProfile//Load factory item
             }));
         }
 
@@ -405,7 +402,7 @@ namespace SubZero
                             Environment.Exit(1); //User said no
                         ApplicationSettings = loadedSettings;
                         ApplicationSettings.Version = configFileVersion;
-                        saveButton_Click(sender, e);
+                        await SaveData();
                         Environment.Exit(0);
                     }
                     if (loadedSettings.ModelName != LaptopModel)
@@ -416,7 +413,7 @@ namespace SubZero
                             Environment.Exit(1); //User said no
                         ApplicationSettings = loadedSettings;
                         ApplicationSettings.ModelName = LaptopModel;
-                        saveButton_Click(sender, e);
+                        await SaveData();
                         Environment.Exit(0);
                     }
                     ProcessSettings(loadedSettings);
@@ -501,6 +498,8 @@ namespace SubZero
         /// </summary>
         private void TemperatureAndFanThread()
         {
+            CPURPM = "N/A";
+            GPURPM = "N/A";
             while (runTemperatureAndFanThread)
             {
                 HardwareMonitor.FanController.RefreshFans();
@@ -525,76 +524,90 @@ namespace SubZero
         /// <summary>
         /// Happens when profile TAB is changed, we need to load different settings
         /// </summary>
-        /// <param name="sender">We are ignoring this param</param>
+        /// <param name="sender">Sender calling this method</param>
         /// <param name="e">We are checking AddedItems as ListBoxItem</param>
         private async void profilesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (duplicateCall)
+            {
+                duplicateCall = false; //We requested to not handle this event
+                return;
+            }    
             //TODO: Add check if we have edited state
-            if (!DialogHost.IsDialogOpen("mainDialog"))
+            if (!DialogHost.IsDialogOpen("mainDialog") && !(sender is Button) && (sender as Button)?.Name != "Discard")
             {
                 if (!IsSaved)
                 {
-                    var dialog = YesNoDialog.ShowWarningDialog("You have unsaved data which will be lost.\nDo you want to save first?", () => { DialogHost.Close("mainDialog"); });
+                    var dialog = YesNoCancelDialog.ShowWarningDialog("You have unsaved data which will be lost.\nDo you want to save first?", () => { DialogHost.Close("mainDialog"); });
                     _ = await DialogHost.Show(dialog, "mainDialog");
-                    if (dialog.DialogResult)
+                    if (!dialog.DialogResult.HasValue)
                     {
-                        saveButton_Click(sender, new RoutedEventArgs(e.RoutedEvent)); //Save first
+                        //Cancel is pressed
+                        e.Handled = true; //We are handling it here, cancel
+                        duplicateCall = true; //Expect ListBox changed
+                        profilesList.SelectedIndex = ApplicationSettings.SelectedProfileIndex;
+                        return;
+                    }
+                    if (dialog.DialogResult.Value)
+                    {
+                        await SaveData();//Save first
                     }
                 }
             }
             if (e.AddedItems.Count == 0)
                 return;
-            var profileInfo = ((e.AddedItems[0] as ListBoxItem).Tag as Profile);
-            ActiveProfile = profileInfo; //Set active profile to real value
-            cpu1.Value = profileInfo.CPU.Value1.FanSpeed / 100d;
-            cpu2.Value = profileInfo.CPU.Value2.FanSpeed / 100d;
-            cpu3.Value = profileInfo.CPU.Value3.FanSpeed / 100d;
-            cpu4.Value = profileInfo.CPU.Value4.FanSpeed / 100d;
-            cpu5.Value = profileInfo.CPU.Value5.FanSpeed / 100d;
-            cpu6.Value = profileInfo.CPU.Value6.FanSpeed / 100d;
+            ApplicationSettings.SelectedProfileIndex = profilesList.SelectedIndex; //Change index!
+            cpu1.Value = ApplicationSettings.CurrentProfile.CPU.Value1.FanSpeed / 100d;
+            cpu2.Value = ApplicationSettings.CurrentProfile.CPU.Value2.FanSpeed / 100d;
+            cpu3.Value = ApplicationSettings.CurrentProfile.CPU.Value3.FanSpeed / 100d;
+            cpu4.Value = ApplicationSettings.CurrentProfile.CPU.Value4.FanSpeed / 100d;
+            cpu5.Value = ApplicationSettings.CurrentProfile.CPU.Value5.FanSpeed / 100d;
+            cpu6.Value = ApplicationSettings.CurrentProfile.CPU.Value6.FanSpeed / 100d;
 
-            gpu1.Value = profileInfo.GPU.Value1.FanSpeed / 100d;
-            gpu2.Value = profileInfo.GPU.Value2.FanSpeed / 100d;
-            gpu3.Value = profileInfo.GPU.Value3.FanSpeed / 100d;
-            gpu4.Value = profileInfo.GPU.Value4.FanSpeed / 100d;
-            gpu5.Value = profileInfo.GPU.Value5.FanSpeed / 100d;
-            gpu6.Value = profileInfo.GPU.Value6.FanSpeed / 100d;
+            gpu1.Value = ApplicationSettings.CurrentProfile.GPU.Value1.FanSpeed / 100d;
+            gpu2.Value = ApplicationSettings.CurrentProfile.GPU.Value2.FanSpeed / 100d;
+            gpu3.Value = ApplicationSettings.CurrentProfile.GPU.Value3.FanSpeed / 100d;
+            gpu4.Value = ApplicationSettings.CurrentProfile.GPU.Value4.FanSpeed / 100d;
+            gpu5.Value = ApplicationSettings.CurrentProfile.GPU.Value5.FanSpeed / 100d;
+            gpu6.Value = ApplicationSettings.CurrentProfile.GPU.Value6.FanSpeed / 100d;
 
             if (ApplicationSettings.UseCelsius)
             {
-                cpuTemp1.Text = $"{profileInfo.CPU.Value1.Temperature} °C";
-                cpuTemp2.Text = $"{profileInfo.CPU.Value2.Temperature} °C";
-                cpuTemp3.Text = $"{profileInfo.CPU.Value3.Temperature} °C";
-                cpuTemp4.Text = $"{profileInfo.CPU.Value4.Temperature} °C";
-                cpuTemp5.Text = $"{profileInfo.CPU.Value5.Temperature} °C";
-                cpuTemp6.Text = $"{profileInfo.CPU.Value6.Temperature} °C";
+                cpuTemp1.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value1.Temperature} °C";
+                cpuTemp2.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value2.Temperature} °C";
+                cpuTemp3.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value3.Temperature} °C";
+                cpuTemp4.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value4.Temperature} °C";
+                cpuTemp5.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value5.Temperature} °C";
+                cpuTemp6.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value6.Temperature} °C";
 
-                gpuTemp1.Text = $"{profileInfo.GPU.Value1.Temperature} °C";
-                gpuTemp2.Text = $"{profileInfo.GPU.Value2.Temperature} °C";
-                gpuTemp3.Text = $"{profileInfo.GPU.Value3.Temperature} °C";
-                gpuTemp4.Text = $"{profileInfo.GPU.Value4.Temperature} °C";
-                gpuTemp5.Text = $"{profileInfo.GPU.Value5.Temperature} °C";
-                gpuTemp6.Text = $"{profileInfo.GPU.Value6.Temperature} °C";
+                gpuTemp1.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value1.Temperature} °C";
+                gpuTemp2.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value2.Temperature} °C";
+                gpuTemp3.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value3.Temperature} °C";
+                gpuTemp4.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value4.Temperature} °C";
+                gpuTemp5.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value5.Temperature} °C";
+                gpuTemp6.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value6.Temperature} °C";
             }
             else
             {
-                cpuTemp1.Text = $"{profileInfo.CPU.Value1.Temperature.ToFahrenheit()} °F";
-                cpuTemp2.Text = $"{profileInfo.CPU.Value2.Temperature.ToFahrenheit()} °F";
-                cpuTemp3.Text = $"{profileInfo.CPU.Value3.Temperature.ToFahrenheit()} °F";
-                cpuTemp4.Text = $"{profileInfo.CPU.Value4.Temperature.ToFahrenheit()} °F";
-                cpuTemp5.Text = $"{profileInfo.CPU.Value5.Temperature.ToFahrenheit()} °F";
-                cpuTemp6.Text = $"{profileInfo.CPU.Value6.Temperature.ToFahrenheit()} °F";
+                cpuTemp1.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value1.Temperature.ToFahrenheit()} °F";
+                cpuTemp2.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value2.Temperature.ToFahrenheit()} °F";
+                cpuTemp3.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value3.Temperature.ToFahrenheit()} °F";
+                cpuTemp4.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value4.Temperature.ToFahrenheit()} °F";
+                cpuTemp5.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value5.Temperature.ToFahrenheit()} °F";
+                cpuTemp6.Text = $"{ApplicationSettings.CurrentProfile.CPU.Value6.Temperature.ToFahrenheit()} °F";
 
-                gpuTemp1.Text = $"{profileInfo.GPU.Value1.Temperature.ToFahrenheit()} °F";
-                gpuTemp2.Text = $"{profileInfo.GPU.Value2.Temperature.ToFahrenheit()} °F";
-                gpuTemp3.Text = $"{profileInfo.GPU.Value3.Temperature.ToFahrenheit()} °F";
-                gpuTemp4.Text = $"{profileInfo.GPU.Value4.Temperature.ToFahrenheit()} °F";
-                gpuTemp5.Text = $"{profileInfo.GPU.Value5.Temperature.ToFahrenheit()} °F";
-                gpuTemp6.Text = $"{profileInfo.GPU.Value6.Temperature.ToFahrenheit()} °F";
+                gpuTemp1.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value1.Temperature.ToFahrenheit()} °F";
+                gpuTemp2.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value2.Temperature.ToFahrenheit()} °F";
+                gpuTemp3.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value3.Temperature.ToFahrenheit()} °F";
+                gpuTemp4.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value4.Temperature.ToFahrenheit()} °F";
+                gpuTemp5.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value5.Temperature.ToFahrenheit()} °F";
+                gpuTemp6.Text = $"{ApplicationSettings.CurrentProfile.GPU.Value6.Temperature.ToFahrenheit()} °F";
             }
-
-
-            IsEdited = false;
+            await SaveData(false); //We changed index, save for safety
+            if (ApplicationSettings.TurnedOn)
+                IsEdited = true;
+            else
+                IsEdited = false;
         }
 
         /// <summary>
@@ -602,26 +615,24 @@ namespace SubZero
         /// </summary>
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
+            await SaveData();
+        }
+
+        private async Task SaveData(bool wait = true)
+        {
             bool ourDialog = false;
-            if (!DialogHost.IsDialogOpen("mainDialog"))
+            if (!DialogHost.IsDialogOpen("mainDialog") && wait)
             {
                 _ = DialogHost.Show(new LoadingDialog("Saving..."), "mainDialog");
                 ourDialog = true;
             }
             if (IsEdited)
-                applyButton_Click(sender, e); //Apply settings first
-            List<Profile> profilesTemp = new List<Profile>();
-            foreach (var item in profilesList.Items)
-            {
-                profilesTemp.Add(((item as ListBoxItem).Tag as Profile));
-            }
-            if (profilesTemp.Count > 0)
-                ApplicationSettings.Profiles = profilesTemp.ToArray();
+                applyButton_Click(this, new RoutedEventArgs()); //Apply settings first
             try
             {
                 File.WriteAllText(configFileName, JsonConvert.SerializeObject(ApplicationSettings, Formatting.Indented)); //Try to save
                 IsSaved = true;
-                if (ourDialog)
+                if (ourDialog && wait)
                 {
                     await Task.Run(() =>
                     {
@@ -667,7 +678,7 @@ namespace SubZero
             {
                 _ = DialogHost.Show(new LoadingDialog("Disabling..."), "mainDialog");
             }
-            saveButton_Click(sender, e);
+            await SaveData();
             using (ManagementObjectCollection system = MSIWmiHelper.MSI_System.Get())
             {
                 var fanObject = system.Cast<ManagementObject>().ElementAt(9);

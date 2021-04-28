@@ -46,7 +46,7 @@
                 </ToolBar>
             </ToolBarTray>
             <StackPanel Grid.Row="1" HorizontalAlignment="Center" Orientation="Horizontal">
-                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="CPU Temperature" MinWidth="85">
                     <materialDesign:Chip.Icon>
                         <materialDesign:PackIcon Kind="Temperature" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>
@@ -56,14 +56,14 @@
                         <materialDesign:PackIcon Kind="Cpu64Bit" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>
                 </materialDesign:Chip>
-                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding CPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="CPU Fan RPM" MinWidth="85">
                     <materialDesign:Chip.Icon>
                         <materialDesign:PackIcon Kind="Fan" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>
                 </materialDesign:Chip>
             </StackPanel>
             <StackPanel Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal">
-                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPUTemperature, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Temperature" MinWidth="85">
                     <materialDesign:Chip.Icon>
                         <materialDesign:PackIcon Kind="Temperature" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>
@@ -73,7 +73,7 @@
                         <materialDesign:PackIcon Kind="ExpansionCard" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>
                 </materialDesign:Chip>
-                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM">
+                <materialDesign:Chip Margin="5,0" Foreground="{DynamicResource MaterialDesignBody}" IsEnabled="False" Content="{Binding GPURPM, UpdateSourceTrigger=PropertyChanged, IsAsync=True}" ToolTip="GPU Fan RPM" MinWidth="85">
                     <materialDesign:Chip.Icon>
                         <materialDesign:PackIcon Kind="Fan" Width="30" Height="30" />
                     </materialDesign:Chip.Icon>

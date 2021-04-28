@@ -21,6 +21,11 @@ namespace SubZero.Models
         #region Public Properties
 
         /// <summary>
+        /// Name of the profile
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
         /// CPU Fan speeds
         /// </summary>
         public TemperatureSettings CPU { get; set; }
@@ -29,11 +34,6 @@ namespace SubZero.Models
         /// GPU Fan speeds
         /// </summary>
         public TemperatureSettings GPU { get; set; }
-
-        /// <summary>
-        /// Name of the profile
-        /// </summary>
-        public string Name { get; set; }
 
         #endregion Public Properties
     }
@@ -48,10 +48,11 @@ namespace SubZero.Models
 
         public Settings()
         {
-            Profiles = new Profile[0];
+            Profiles = Array.Empty<Profile>();
             PollingSpeed = 2000;
             TurnedOn = false;
             UseCelsius = true;
+            SelectedProfileIndex = 0;
         }
 
         #endregion Public Constructors
@@ -72,6 +73,17 @@ namespace SubZero.Models
         /// Used profiles, can never be null or empty array!
         /// </summary>
         public Profile[] Profiles { get; set; }
+
+        /// <summary>
+        /// Which profile is currently selected?
+        /// </summary>
+        public int SelectedProfileIndex { get; set; }
+
+        /// <summary>
+        /// Get current profile by index
+        /// </summary>
+        [Newtonsoft.Json.JsonIgnore]//IGNORE!
+        public Profile CurrentProfile => Profiles[SelectedProfileIndex];
 
         /// <summary>
         /// Is SubZero active?
