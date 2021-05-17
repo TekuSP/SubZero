@@ -1,12 +1,19 @@
-﻿using System.Management;
+﻿using System;
+using System.Management;
 
 namespace SubZero.Models
 {
     /// <summary>
     /// Helper for working with MSI WMI Objects
     /// </summary>
-    public class MSIWmiHelper
+    public class MSIWmiHelper : IDisposable
     {
+        #region Private Fields
+
+        private bool disposedValue;
+
+        #endregion Private Fields
+
         #region Public Constructors
 
         /// <summary>
@@ -14,12 +21,25 @@ namespace SubZero.Models
         /// </summary>
         public MSIWmiHelper()
         {
+            //Init Windows Management Instrumentation Roots, specific to MSI
+            var WMIRoot = new ManagementScope("root\\WMI", new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = AuthenticationLevel.Connect,
+                EnablePrivileges = true
+            });
+            var CIMV2Root = new ManagementScope("root\\CIMV2", new ConnectionOptions
+            {
+                Impersonation = ImpersonationLevel.Impersonate,
+                Authentication = AuthenticationLevel.Connect,
+                EnablePrivileges = true
+            });
             //Init Windows Management Instrumentation, specific to MSI
-            MSI_CPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_CPU");
-            MSI_GPU = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_VGA");
-            MSI_AP = new ManagementObjectSearcher("root\\WMI", "SELECT AP FROM MSI_AP");
-            MSI_LaptopModel = new ManagementObjectSearcher("root\\CIMV2", "SELECT Model FROM Win32_ComputerSystem");
-            MSI_System = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM MSI_System");
+            MSI_CPU = new ManagementObjectSearcher(WMIRoot, new ObjectQuery("SELECT * FROM MSI_CPU"));
+            MSI_GPU = new ManagementObjectSearcher(WMIRoot, new ObjectQuery("SELECT * FROM MSI_VGA"));
+            MSI_AP = new ManagementObjectSearcher(WMIRoot, new ObjectQuery("SELECT AP FROM MSI_AP"));
+            MSI_LaptopModel = new ManagementObjectSearcher(CIMV2Root, new ObjectQuery("SELECT Model FROM Win32_ComputerSystem"));
+            MSI_System = new ManagementObjectSearcher(WMIRoot, new ObjectQuery("SELECT * FROM MSI_System"));
             //Test if they are valid
             using (ManagementObjectCollection test = MSI_CPU.Get())
             {
@@ -98,5 +118,51 @@ namespace SubZero.Models
         public ManagementObjectSearcher MSI_System { get; private set; }
 
         #endregion Public Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Dispose implementation
+        /// </summary>
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        #endregion Public Methods
+
+        #region Protected Methods
+
+        /// <summary>
+        /// Dispose implementation
+        /// </summary>
+        /// <param name="disposing">Is managed disposing?</param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    //Managed disposing
+                    MSI_AP.Dispose();
+                    MSI_CPU.Dispose();
+                    MSI_GPU.Dispose();
+                    MSI_LaptopModel.Dispose();
+                    MSI_System.Dispose();
+                }
+                //Unmanaged disposing
+                MSI_AP = null;
+                MSI_CPU = null;
+                MSI_GPU = null;
+                MSI_LaptopModel = null;
+                MSI_System = null;
+                //Confirm dispose
+                disposedValue = true;
+            }
+        }
+
+        #endregion Protected Methods
     }
 }
