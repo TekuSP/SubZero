@@ -43,23 +43,58 @@ namespace SubZero.Models
             //Test if they are valid
             using (ManagementObjectCollection test = MSI_CPU.Get())
             {
-                IsAvailableMSI_CPU = test.Count != 0;
+                try
+                {
+                    IsAvailableMSI_CPU = test.Count != 0;
+                }
+                catch
+                {
+                    IsAvailableMSI_CPU = false;
+                }
             }
             using (ManagementObjectCollection test = MSI_GPU.Get())
             {
-                IsAvailableMSI_GPU = test.Count != 0;
+                try
+                {
+                    IsAvailableMSI_GPU = test.Count != 0;
+                }
+                catch
+                {
+                    IsAvailableMSI_GPU = false;
+                }
             }
             using (ManagementObjectCollection test = MSI_AP.Get())
             {
-                IsAvailableMSI_AP = test.Count != 0;
+                try
+                {
+                    IsAvailableMSI_AP = test.Count != 0;
+                }
+                catch
+                {
+                    IsAvailableMSI_AP = false;
+                }
             }
             using (ManagementObjectCollection test = MSI_LaptopModel.Get())
             {
-                IsAvailableMSI_LaptopModel = test.Count != 0;
+                try
+                {
+                    IsAvailableMSI_LaptopModel = test.Count != 0;
+                }
+                catch
+                {
+                    IsAvailableMSI_LaptopModel = false;
+                }
             }
             using (ManagementObjectCollection test = MSI_System.Get())
             {
-                IsAvailableMSI_System = test.Count != 0;
+                try
+                {
+                    IsAvailableMSI_System = test.Count != 0;
+                }
+                catch
+                {
+                    IsAvailableMSI_System = false;
+                }
             }
         }
 
