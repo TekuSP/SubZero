@@ -386,13 +386,13 @@ namespace SubZero
                 if (!MSIWmiHelper.IsAvailableMSI_CPU || !MSIWmiHelper.IsAvailableMSI_GPU)
                 {
                     //Not detected MSI laptop, show dialog to user
-                    MessageBox.Show("Not an MSI laptop, or WMI for MSI not installed!", "Error", MessageBox.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Not an MSI laptop, or WMI for MSI not installed!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
                 if (!MSIWmiHelper.IsAvailableMSI_LaptopModel)
                 {
                     //Huh, is this MSI Laptop? Inform user, but continue execution
-                    MessageBox.Show("This is MSI laptop? Unknown model detected, continuing...", "Warning", MessageBox.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("This is MSI laptop? Unknown model detected, continuing...", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
                     LaptopModel = "Unknown";
                 }
                 else
