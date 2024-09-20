@@ -70,7 +70,7 @@ pull_request_rules:
            toggle:
              - merged
             
-    - name: Assign non Dependabot PR to author: TekuSP
+    - name: "Assign non Dependabot PR to author: TekuSP"
       conditions:
       - "#files = 1"
       - "author!=dependabot[bot]"
