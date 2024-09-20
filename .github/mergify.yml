@@ -7,12 +7,12 @@ pull_request_rules:
         merge:
           method: merge
           commit_message_template: |
-            Merge from {{ branch }}
-            
+            Merge from {{ head }}
+                        
             {{ title }} (#{{ number }})
-            
+                        
             {{ body }}
-            
+                        
             {% for user in approved_reviews_by %}
             Approved-By: {{user}}
             {% endfor %}
@@ -25,13 +25,11 @@ pull_request_rules:
         merge:
           method: merge
           commit_message_template: |
-            Automerge from {{ branch }}
+            Automerge from {{ head }}
             
             {{ title }} (#{{ number }})
             
             {{ body }}
-            
-            {% endfor %}
           
     - name: Automatically approve Dependenabot bot's PRs
       conditions:
