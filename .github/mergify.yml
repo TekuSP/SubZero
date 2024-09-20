@@ -1,7 +1,6 @@
 pull_request_rules:
     - name: Automatically merge PRs
-      conditions:
-      - check-success=continuous-integration/travis/pr
+      conditions:   
       - "#approved-reviews-by>=1"
       actions:
         merge:
@@ -20,7 +19,6 @@ pull_request_rules:
     - name: Automatically Dependenabot bot's PRs
       conditions:
       - author=dependabot[bot]
-      - status-success=continuous-integration/travis/pr
       actions:
         merge:
           method: merge
@@ -80,10 +78,3 @@ pull_request_rules:
           toggle:
             - "In Review"
                 
-    - name: Toggle label when CI Fails
-      conditions:
-      - check-failure=continuous-integration/travis/pr
-      actions:
-        label:
-          toggle:
-            - "CI Pipeline: Failure"
