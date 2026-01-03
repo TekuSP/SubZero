@@ -3,12 +3,12 @@ updates:
 - package-ecosystem: nuget
   directory: "/"
   schedule:
-    interval: daily
+    interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
 - package-ecosystem: "github-actions"
   directory: "/"
   schedule:
     # Check for updates to GitHub Actions every week
-    interval: daily
+    interval: weekly
     time: "04:00"
